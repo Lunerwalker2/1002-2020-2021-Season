@@ -8,6 +8,7 @@ public class TeleOpMain extends OpMode {
 
     private final double[][] matrix = {{1, 1, 1, 1}, {1, -1, 1, -1}, {1, 1, -1, -1}};
 
+    private double[] output;
     @Override
     public void init(){
         drive = new Drive(this, () -> gamepad1.right_bumper, matrix);
@@ -25,7 +26,7 @@ public class TeleOpMain extends OpMode {
 
     @Override
     public void loop(){
-        drive.drive(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
+        output = drive.drive(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
     }
 
     @Override
