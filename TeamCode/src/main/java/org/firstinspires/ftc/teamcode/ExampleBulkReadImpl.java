@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.openftc.revextensions2.ExpansionHubEx;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 public class ExampleBulkReadImpl extends LinearOpMode {
 
 
-    private DcMotorEx left_front_drive, left_back_drive, right_front_drive, right_back_drive;
+    private DcMotorEx left_front_drive, left_back_drive, right_front_drive, right_back_drive = null;
 
     private double[] encoders = new double[4];
 
@@ -65,6 +66,7 @@ public class ExampleBulkReadImpl extends LinearOpMode {
         while (opModeIsActive()){
             for(DcMotorEx motor : motors){
                 telemetry.addData("Motor" + motor.toString() + "Encoder Val", motor.getCurrentPosition());
+                telemetry.addData("Motor" + motor.toString() + "Encoder Velo (deg/sec)", motor.getVelocity(AngleUnit.DEGREES));
             }
             cumalitiveTime += cycleTime.milliseconds();
             telemetry.addData("Cycle Time", cumalitiveTime/loopNum);
