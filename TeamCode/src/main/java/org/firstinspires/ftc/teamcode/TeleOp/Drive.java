@@ -1,25 +1,23 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.teamcode.Util.MathThings;
+
+import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
 
 public class Drive {
 
 
-    public static double[] m_v_mult(double[][] m, double[] v) {
-        double[] out = new double[4];
-        out[0] = v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0];
-        out[1] = v[0] * m[0][1] + v[1] * m[1][1] + v[2] * m[2][1];
-        out[2] = v[0] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2];
-        out[3] = v[0] * m[0][3] + v[1] * m[1][3] + v[2] * m[2][3];
-        return out;
-    }
 
     private Gamepad gamepad1;
 
     private Func<Boolean> slowModeOn;
+
+    private Func<Double> cubingFactor;
 
     private static double[][] basic_matrix = {{1, 1, 1, 1}, {1, -1, 1, -1}, {1, 1, -1, -1}};
 
@@ -32,12 +30,34 @@ public class Drive {
     }
 
     public Drive(OpMode opMode, Func<Boolean> slowModeOn, double[][] matrix){
+        this(opMode, slowModeOn, matrix, () -> 0.0);
+    }
+
+    /**
+     * Use this to cube the inputs
+     */
+    public Drive(OpMode opMode, Func<Boolean> slowModeOn, double[][] matrix, Func<Double> cubingFactor){
         this.gamepad1 = opMode.gamepad1;
         this.slowModeOn = slowModeOn;
         basic_matrix = matrix;
+        this.cubingFactor = cubingFactor;
     }
 
+    /**
+     *
+     * @param inputs {left stick x, left stick y, right stick x}
+     * @return The drive train powers
+     */
     public double[] drive(double[] inputs){
+
+        Vector2d translation = new Vector2d(inputs[0], inputs[1]);
+
+        double newMag = MathThings.cubeInput(translation.magnitude(), cubingFactor.value());
+        double theta = translation.angle();
+        translation = new Vector2d(newMag*Math.cos(theta), newMag*Math.sin(theta));
+
+        inputs[0] = translation.getX();
+        inputs[1] = translation.getY();
 
         double[] output = m_v_mult(basic_matrix, inputs);
 
