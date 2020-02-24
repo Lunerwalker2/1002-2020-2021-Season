@@ -25,7 +25,14 @@ public class CurvePoint {
         this.slowDownTurnAmount = slowDownTurnAmount;
     }
 
-    public CurvePoint(CurvePoint thisPoint){
-        
+    public CurvePoint(CurvePoint nextPoint){
+        x = nextPoint.x;
+        y = nextPoint.y;
+        moveSpeed = nextPoint.moveSpeed;
+        turnSpeed = nextPoint.turnSpeed;
+        followDistance = nextPoint.followDistance;
+        pointLength = nextPoint.pointLength;
+        slowDownTurnRadians = nextPoint.slowDownTurnRadians;
+        slowDownTurnAmount = nextPoint.slowDownTurnAmount;
     }
 }
