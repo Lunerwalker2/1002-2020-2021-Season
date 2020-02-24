@@ -67,7 +67,7 @@ public class PPMathFunctions {
             xRoot2 += circleCenter.x;
             yRoot2 += circleCenter.y;
 
-            if(xRoot1 > minX && xRoot1 < maxX){
+            if(xRoot2 > minX && xRoot2 < maxX){
                 allPoints.add(new Point(xRoot1, yRoot1));
             }
 
