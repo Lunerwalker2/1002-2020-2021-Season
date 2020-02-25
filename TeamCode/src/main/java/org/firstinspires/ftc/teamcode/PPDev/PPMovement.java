@@ -2,6 +2,12 @@ package org.firstinspires.ftc.teamcode.PPDev;
 
 import com.qualcomm.robotcore.util.Range;
 
+import org.opencv.core.Point;
+import java.util.ArrayList;
+
+import static org.firstinspires.teamcode.PPDev.PPMathFunctions.AngleWrap;
+import static org.firstinspires.teamcode.PPDev.PPMathFunctions.lineCircleIntersection;
+
 public class PPMovement {
 
     //Make these actuall things
@@ -14,6 +20,20 @@ public class PPMovement {
     public static double movement_turn = 0;
 
     //Optimal direction is forward (even though it's holonomic)
+    
+    
+    public static CurcePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, Point robotLocation, double followRadius){
+        CurvePoint followMe = new CurvePoint(pathPoints.get(0));
+        
+        for(int i = 0; i < pathPoints.size();i++){
+            CurvePoint startLine = pathPoints.get(i);
+            CurvePoint endLine = pathPoints.get(i + 1);
+            
+            //Paused here
+            //https://youtu.be/KL8cTQbEBwQ
+            //ArrayList<Point> intersections = lineCircleIntersection(robotLocation, followRadius, st
+        }
+    }
 
 
     //Turn towards optimal angle
