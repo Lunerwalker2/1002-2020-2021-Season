@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems;
 
 import com.arcrobotics.ftclib.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -9,11 +9,12 @@ import org.firstinspires.ftc.teamcode.Util.MathThings;
 
 import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
 
-public class Drive {
+/**
+ * This class is a little special because it doesn't really use the methods it overrides
+ */
+public class Drive extends TeleOpSystem {
 
 
-
-    private Gamepad gamepad1;
 
     private Func<Boolean> slowModeOn;
 
@@ -37,11 +38,29 @@ public class Drive {
      * Use this to cube the inputs
      */
     public Drive(OpMode opMode, Func<Boolean> slowModeOn, double[][] matrix, Func<Double> cubingFactor){
-        this.gamepad1 = opMode.gamepad1;
+        super(opMode);
+
         this.slowModeOn = slowModeOn;
         basic_matrix = matrix;
         this.cubingFactor = cubingFactor;
     }
+
+    @Override
+    public void initHardware(){
+
+    }
+
+    @Override
+    public void update(){
+
+    }
+
+    @Override
+    public void stop(){
+
+    }
+
+
 
     /**
      *
