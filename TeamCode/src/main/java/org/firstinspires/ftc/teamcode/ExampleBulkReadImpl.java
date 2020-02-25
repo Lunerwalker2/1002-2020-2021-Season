@@ -31,6 +31,12 @@ public class ExampleBulkReadImpl extends LinearOpMode {
      * The AUTO function reads a bulk rad every loop, however it will happen again if another
      * "get" method is called in that loop. Therefore, store the value once, and use that each loop.
      */
+    
+    /*However,
+    * The MANUAL mode is the MOST efficient, and it only requires that you clear the cache at the start of each loop. 
+    * The bulk read is done on the first "get" call and you can do more get calls. Aside from the first read, no more reads are
+    * done until the cahce is cleared again
+    */
 
     private ArrayList<DcMotorEx> motors = new ArrayList<>();
 
@@ -54,7 +60,7 @@ public class ExampleBulkReadImpl extends LinearOpMode {
         motors.add(right_back_drive);
 
         for (ExpansionHubEx hub : allHubs) {
-            hub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            hub.getStandardModule().setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
         double cumalitiveTime = 0;
@@ -64,6 +70,8 @@ public class ExampleBulkReadImpl extends LinearOpMode {
 
         int loopNum = 1;
         while (opModeIsActive()){
+            clearBulkCache();
+            
             for(DcMotorEx motor : motors){
                 telemetry.addData("Motor" + motor.toString() + "Encoder Val", motor.getCurrentPosition());
                 telemetry.addData("Motor" + motor.toString() + "Encoder Velo (deg/sec)", motor.getVelocity(AngleUnit.DEGREES));
@@ -75,5 +83,9 @@ public class ExampleBulkReadImpl extends LinearOpMode {
             loopNum++;
         }
 
+    }
+    private void clearBulkCache(){
+        for(ExpansionHubEx hub : allHubs){
+            hub.getStandardModule().clearBulkCache();
     }
 }
