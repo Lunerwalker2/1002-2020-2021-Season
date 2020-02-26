@@ -9,7 +9,7 @@ public class PPMathFunctions {
 
 
     //Makes sure that angle is within the range -180 to 180 degrees
-    public static double angleWrap(double angle){
+    public static double AngleWrap(double angle){
         while (angle < -Math.PI){
             angle += (2 * Math.PI);
         }
@@ -61,14 +61,14 @@ public class PPMathFunctions {
 
             double xRoot2 = (-quadraticB - sqrt(pow(quadraticB,2) - (4.0 * quadraticA * quadraticC)))/(2.0*quadraticA);
 
-            double yRoot2 = m1 * xRoot2;
+            double yRoot2 = m1 * (xRoot2 - x1) + y1;
 
             //Put back the offset
             xRoot2 += circleCenter.x;
             yRoot2 += circleCenter.y;
 
             if(xRoot2 > minX && xRoot2 < maxX){
-                allPoints.add(new Point(xRoot1, yRoot1));
+                allPoints.add(new Point(xRoot2, yRoot2));
             }
 
         } catch (Exception e){

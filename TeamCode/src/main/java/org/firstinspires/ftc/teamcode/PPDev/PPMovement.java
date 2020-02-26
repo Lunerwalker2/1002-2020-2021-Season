@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.opencv.core.Point;
 import java.util.ArrayList;
 
-import static org.firstinspires.teamcode.PPDev.PPMathFunctions.AngleWrap;
-import static org.firstinspires.teamcode.PPDev.PPMathFunctions.lineCircleIntersection;
+import static org.firstinspires.ftc.teamcode.PPDev.PPMathFunctions.lineCircleIntersection;
+import static org.firstinspires.ftc.teamcode.PPDev.PPMathFunctions.AngleWrap;
 
 public class PPMovement {
 
@@ -20,19 +20,44 @@ public class PPMovement {
     public static double movement_turn = 0;
 
     //Optimal direction is forward (even though it's holonomic)
+
+    public static void followCurve(ArrayList<CurvePoint> allPoints, double followingAngle){
+        for(int i = 0; i < allPoints.size()-1; i++){
+
+        }
+
+        CurvePoint followMe = getFollowPointPath(allPoints, new Point(world_x_position, world_y_position), allPoints.get(0).followDistance);
+
+        //I SKIPPED DEBUGGING FROM THE TUTORIAL!!
+
+        goToPosition(followMe.x, followMe.y, followMe.moveSpeed, followingAngle, followMe.turnSpeed);
+    }
     
     
-    public static CurcePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, Point robotLocation, double followRadius){
+    public static CurvePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, Point robotLocation, double followRadius){
         CurvePoint followMe = new CurvePoint(pathPoints.get(0));
         
         for(int i = 0; i < pathPoints.size();i++){
             CurvePoint startLine = pathPoints.get(i);
             CurvePoint endLine = pathPoints.get(i + 1);
-            
-            //Paused here
-            //https://youtu.be/KL8cTQbEBwQ
-            //ArrayList<Point> intersections = lineCircleIntersection(robotLocation, followRadius, st
+
+
+            ArrayList<Point> intersections = lineCircleIntersection(robotLocation, followRadius, startLine.toPoint(),
+                    endLine.toPoint());
+
+            double closestAngle = 10000000;
+
+            for(Point thisIntersection : intersections){
+                double angle = Math.atan2(thisIntersection.y-world_y_position, thisIntersection.x-world_x_position);
+                double deltaAngle = Math.abs(PPMathFunctions.AngleWrap(angle - world_angle_rad));
+
+                if(deltaAngle < closestAngle){
+                    closestAngle = deltaAngle;
+                    followMe.setPoint(thisIntersection);
+                }
+            }
         }
+        return followMe;
     }
 
 
@@ -49,7 +74,7 @@ public class PPMovement {
 
         double absoluteAngleToTarget = Math.atan2(y - world_y_position, x - world_x_position);
 
-        double relativeAngleToPoint = PPMathFunctions.angleWrap(absoluteAngleToTarget - (world_angle_rad - Math.toRadians(90)));
+        double relativeAngleToPoint = AngleWrap(absoluteAngleToTarget - (world_angle_rad - Math.toRadians(90)));
 
         double relativeXToPoint = Math.cos(relativeAngleToPoint) * distanceToTarget;
         double relativeYToPoint = Math.sin(relativeAngleToPoint) * distanceToTarget;

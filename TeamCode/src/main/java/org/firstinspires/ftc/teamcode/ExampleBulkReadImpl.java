@@ -84,8 +84,9 @@ public class ExampleBulkReadImpl extends LinearOpMode {
         }
 
     }
-    private void clearBulkCache(){
-        for(ExpansionHubEx hub : allHubs){
+    private void clearBulkCache() {
+        for (ExpansionHubEx hub : allHubs) {
             hub.getStandardModule().clearBulkCache();
+        }
     }
 }
