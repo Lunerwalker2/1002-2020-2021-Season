@@ -30,8 +30,8 @@ public class MathThings {
     * Normalize to -180 to 180
     */
     public static double normalizeDeg(double angle){
-        while (angle >= 180.0) degrees -= 360.0;
-        while (angle < -180.0) degrees += 360.0;
+        while (angle >= 180.0) angle -= 360.0;
+        while (angle < -180.0) angle += 360.0;
         return angle;  
     }
 
