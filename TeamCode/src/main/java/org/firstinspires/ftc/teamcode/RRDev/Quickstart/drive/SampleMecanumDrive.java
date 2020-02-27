@@ -29,9 +29,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.Auto.Subsystems.Drive;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,9 +80,11 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private List<Pose2d> poseHistory;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
-    private List<DcMotorEx> motors;
     private BNO055IMU imu;
+
+    private List<LynxModule> hubs;
+
+    private Drive drive;
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH);
@@ -103,28 +107,26 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
-        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
+        hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule module : hubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
+        drive = new Drive(hardwareMap);
+        drive.initHardware();
+
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, HardwareNames.Sensors.LEFT_HUB_IMU);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
-        // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
+
         // upward (normal to the floor) using a command like the following:
         // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.LEFT_FRONT);
-        leftRear = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.LEFT_BACK);
-        rightRear = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.RIGHT_FRONT);
-        rightFront = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.RIGHT_BACK);
 
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
-
-        for (DcMotorEx motor : motors) {
+        for (DcMotorEx motor : drive.getMotors()) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
             motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
             motor.setMotorType(motorConfigurationType);
@@ -140,10 +142,13 @@ public class SampleMecanumDrive extends MecanumDrive {
             setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
 
-        // TODO: reverse any motors using DcMotor.setDirection()
+        //RIGHT SIDE IS REVERSED
+        drive.reverseRightSide();
 
-        // TODO: if desired, use setLocalizer() to change the localization method
-        // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
+
+
+        //if desired, use setLocalizer() to change the localization method
+        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -196,6 +201,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void update() {
 
+        //Clear the current bulk cache
+        clearBulkCache();
 
         updatePoseEstimate();
 
@@ -283,35 +290,39 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void setMode(DcMotor.RunMode runMode) {
-        for (DcMotorEx motor : motors) {
-            motor.setMode(runMode);
-        }
+        drive.setMode(runMode);
     }
 
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
-        for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(zeroPowerBehavior);
-        }
+        drive.setZeroPowerBehavior(zeroPowerBehavior);
     }
 
+
     public PIDCoefficients getPIDCoefficients(DcMotor.RunMode runMode) {
-        PIDFCoefficients coefficients = leftFront.getPIDFCoefficients(runMode);
+        PIDFCoefficients coefficients = drive.getPIDCoefficients(runMode);
         return new PIDCoefficients(coefficients.p, coefficients.i, coefficients.d);
     }
 
     public void setPIDCoefficients(DcMotor.RunMode runMode, PIDCoefficients coefficients) {
-        for (DcMotorEx motor : motors) {
+        for (DcMotorEx motor : drive.getMotors()) {
             motor.setPIDFCoefficients(runMode, new PIDFCoefficients(
                     coefficients.kP, coefficients.kI, coefficients.kD, getMotorVelocityF()
             ));
         }
     }
 
+    private void clearBulkCache(){
+        for(LynxModule module : hubs){
+            module.clearBulkCache();
+        }
+    }
+
+
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
         List<Double> wheelPositions = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
+        for (DcMotorEx motor : drive.getMotors()) {
             wheelPositions.add(encoderTicksToInches(motor.getCurrentPosition()));
         }
         return wheelPositions;
@@ -319,7 +330,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public List<Double> getWheelVelocities() {
         List<Double> wheelVelocities = new ArrayList<>();
-        for (DcMotorEx motor : motors) {
+        for (ExpansionHubMotor motor : drive.getMotors()) {
             wheelVelocities.add(encoderTicksToInches(motor.getVelocity()));
         }
         return wheelVelocities;
@@ -327,10 +338,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
-        rightFront.setPower(v3);
+        drive.setPower(new double[] {v, v1, v2, v3});
     }
 
     @Override

@@ -2,12 +2,15 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TeleOpMain extends OpMode {
 
@@ -24,6 +27,9 @@ public class TeleOpMain extends OpMode {
     private ArrayList<TeleOpSystem> systems = new ArrayList<>();
 
 
+    private List<LynxModule> hubs;
+
+
     //MAKE SURE THESE GO LAST!!
 
 
@@ -37,7 +43,7 @@ public class TeleOpMain extends OpMode {
 
         //Init Hardware
 
-        setBulkModeAuto();
+        setBulkModeManual();
 
         for(TeleOpSystem system : systems){
             system.initHardware();
@@ -48,6 +54,18 @@ public class TeleOpMain extends OpMode {
         left_back_drive = findMotor(HardwareNames.Drive.LEFT_BACK);
         right_front_drive = findMotor(HardwareNames.Drive.RIGHT_FRONT);
         right_back_drive = findMotor(HardwareNames.Drive.RIGHT_BACK);
+
+        //Reverse right side
+        right_front_drive.setDirection(DcMotorSimple.Direction.REVERSE);
+        right_back_drive.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        //Set to encoder movement
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //Set to BRAKE
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        stopDrive();
 
 
 
@@ -60,11 +78,15 @@ public class TeleOpMain extends OpMode {
 
     @Override
     public void start(){
-
+        for(TeleOpSystem system : systems){
+            system.onStart();
+        }
     }
 
     @Override
     public void loop(){
+
+        clearBulkCache();
 
 
         //Update all the systems
@@ -73,6 +95,12 @@ public class TeleOpMain extends OpMode {
         }
 
         output = drive.drive(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
+
+        left_front_drive.setPower(output[0]);
+        left_back_drive.setPower(output[1]);
+        right_front_drive.setPower(output[2]);
+        right_back_drive.setPower(output[3]);
+
     }
 
     @Override
@@ -89,6 +117,20 @@ public class TeleOpMain extends OpMode {
         return hardwareMap.get(ExpansionHubMotor.class, id);
     }
 
+    private void setMode(DcMotor.RunMode runMode){
+        left_front_drive.setMode(runMode);
+        left_back_drive.setMode(runMode);
+        right_front_drive.setMode(runMode);
+        right_back_drive.setMode(runMode);
+    }
+
+    private void setZeroPowerBehavior(ExpansionHubMotor.ZeroPowerBehavior behavior){
+        left_front_drive.setZeroPowerBehavior(behavior);
+        left_back_drive.setZeroPowerBehavior(behavior);
+        right_front_drive.setZeroPowerBehavior(behavior);
+        right_back_drive.setZeroPowerBehavior(behavior);
+    }
+
     private void stopDrive(){
         left_front_drive.setPower(0);
         left_back_drive.setPower(0);
@@ -96,9 +138,15 @@ public class TeleOpMain extends OpMode {
         right_back_drive.setPower(0);
     }
 
-    private void setBulkModeAuto(){
+    private void setBulkModeManual(){
         for(LynxModule module : hardwareMap.getAll(LynxModule.class)){
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+    }
+
+    private void clearBulkCache(){
+        for(LynxModule module : hardwareMap.getAll(LynxModule.class)){
+            module.clearBulkCache();
         }
     }
 }

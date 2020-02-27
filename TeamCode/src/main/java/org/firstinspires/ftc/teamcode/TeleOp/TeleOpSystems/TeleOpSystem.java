@@ -25,6 +25,8 @@ public abstract class TeleOpSystem {
         telemetry = opMode.telemetry;
     }
 
+    public void onStart(){}
+
     public abstract void initHardware();
 
     public abstract void update();

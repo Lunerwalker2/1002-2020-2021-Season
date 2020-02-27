@@ -21,5 +21,16 @@ public class HardwareNames {
         public static final String X_ENCODER = "x_encoder";
     }
 
+    // TODO: Change this accordingly
+    public static class Sensors {
+        public static final String LEFT_HUB_IMU = "imu";
+        public static final String RIGHT_HUB_IMU = "imu 1";
+    }
+
+    public static class Hubs {
+        public static final String HUB_10 = "Expansion Hub 10";
+        public static final String HUB_1 = "Expansion Hub 1";
+    }
+
 
 }

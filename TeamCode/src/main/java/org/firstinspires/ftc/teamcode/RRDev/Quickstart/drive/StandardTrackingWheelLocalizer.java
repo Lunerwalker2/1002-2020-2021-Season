@@ -8,6 +8,8 @@ import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,9 +44,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
-        leftEncoder = hardwareMap.dcMotor.get("leftEncoder");
-        rightEncoder = hardwareMap.dcMotor.get("rightEncoder");
-        frontEncoder = hardwareMap.dcMotor.get("frontEncoder");
+        leftEncoder = hardwareMap.dcMotor.get(HardwareNames.Odometry.LEFT_Y_ENCODER);
+        rightEncoder = hardwareMap.dcMotor.get(HardwareNames.Odometry.RIGHT_Y_ENCODER);
+        frontEncoder = hardwareMap.dcMotor.get(HardwareNames.Odometry.X_ENCODER);
     }
 
     public static double encoderTicksToInches(int ticks) {
