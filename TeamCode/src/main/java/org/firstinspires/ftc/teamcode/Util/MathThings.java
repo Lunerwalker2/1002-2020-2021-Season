@@ -34,6 +34,15 @@ public class MathThings {
         while (angle < -180.0) angle += 360.0;
         return angle;  
     }
+    
+    /**
+    * Normalize to -2pi to 2pi
+    */
+    public static double normalizeRad(double angle){
+        while (angle >= 1.0) angle -= 2.0;
+        while (angle < -1.0) angle += 2.0;
+        return angle;
+    }
 
 
 }
