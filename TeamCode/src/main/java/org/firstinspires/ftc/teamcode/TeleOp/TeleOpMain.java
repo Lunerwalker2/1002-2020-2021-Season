@@ -64,7 +64,7 @@ public class TeleOpMain extends OpMode {
         right_back_drive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Set to encoder movement
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //Set to BRAKE
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
