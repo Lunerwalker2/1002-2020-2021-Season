@@ -23,7 +23,6 @@ public class TeleOpReverseStacking extends OpMode {
 
     private ExpansionHubMotor left_front_drive, left_back_drive, right_front_drive, right_back_drive;
 
-
     //Reverse stacking things
     private Intake intake;
     private Outake outake;
@@ -33,9 +32,7 @@ public class TeleOpReverseStacking extends OpMode {
 
     private double[] output;
 
-
     private ArrayList<TeleOpSystem> systems = new ArrayList<>();
-
 
     private List<LynxModule> hubs;
 
@@ -51,12 +48,9 @@ public class TeleOpReverseStacking extends OpMode {
             grabberMove = false;
         }
     }
-
     //MAKE SURE THESE GO LAST!!
 
-
     private Drive drive = new Drive(this, () -> gamepad1.left_bumper, matrix, () -> 0.6);
-
 
     @Override
     public void init(){
@@ -64,11 +58,6 @@ public class TeleOpReverseStacking extends OpMode {
         intake = new Intake(hardwareMap);
         outake = new Outake(hardwareMap);
         grabber = new Grabber(hardwareMap);
-
-
-
-
-
 
         //Add all systems to the list for easy access
         systems.add(drive);
@@ -97,12 +86,7 @@ public class TeleOpReverseStacking extends OpMode {
         //Set to BRAKE
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
-
         stopDrive();
-
-
-
     }
 
     @Override
