@@ -5,9 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.AssetsTrajectoryManager;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
@@ -37,8 +38,16 @@ public class TeleOpMain extends OpMode {
     private Drive drive = new Drive(this, () -> gamepad1.left_bumper, matrix, () -> 0.6);
 
 
+    private boolean bounce1 = false;
+    private boolean soundChanged = false;
+    private PlaySound mego;
+
+
     @Override
-    public void init(){
+    public void init() {
+
+        new PlaySound(hardwareMap, R.raw.shutdown);
+        mego = new PlaySound(hardwareMap, R.raw.megalovania);
 
 
 
@@ -70,9 +79,6 @@ public class TeleOpMain extends OpMode {
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         stopDrive();
-
-
-
     }
 
     @Override
@@ -89,6 +95,8 @@ public class TeleOpMain extends OpMode {
 
     @Override
     public void loop(){
+
+        checkSound();
 
         clearBulkCache();
 
@@ -115,6 +123,26 @@ public class TeleOpMain extends OpMode {
         }
         //Stop drive base
         stopDrive();
+    }
+
+    private void controlSound(){
+        if(!soundChanged){
+            mego.pause();
+            soundChanged = true;
+        } else if(soundChanged){
+            mego.play();
+            soundChanged = false;
+        }
+    }
+
+    private void checkSound(){
+        if(gamepad1.x&&!bounce1){
+            controlSound();
+            bounce1=true;
+        }
+        else if(!gamepad1.x){
+            bounce1=false;
+        }
     }
 
     private ExpansionHubMotor findMotor(String id){

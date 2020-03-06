@@ -9,15 +9,21 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.AssetsTrajectoryManager;
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TeleOpReverseStacking extends OpMode {
+
+
+
+
 
     //Drive motors are going to stay here (this could be changed, but I want to keep track of them)
 
@@ -34,26 +40,20 @@ public class TeleOpReverseStacking extends OpMode {
 
     private ArrayList<TeleOpSystem> systems = new ArrayList<>();
 
-    private List<LynxModule> hubs;
+    //MAKE SURE THESE GO LAST!!
+
 
     private boolean bounce1 = false;
-    private boolean grabberMove = false;
-
-    private void moveGrabber(){
-        if(!grabberMove){
-            grabber.close();
-            grabberMove = true;
-        } else if(grabberMove){
-            grabber.open();
-            grabberMove = false;
-        }
-    }
-    //MAKE SURE THESE GO LAST!!
+    private boolean soundChanged = false;
+    private PlaySound mego;
 
     private Drive drive = new Drive(this, () -> gamepad1.left_bumper, matrix, () -> 0.6);
 
     @Override
     public void init(){
+
+        new PlaySound(hardwareMap, R.raw.shutdown).play();
+        mego = new PlaySound(hardwareMap, R.raw.megalovania);
 
         intake = new Intake(hardwareMap);
         outake = new Outake(hardwareMap);
@@ -119,20 +119,16 @@ public class TeleOpReverseStacking extends OpMode {
         }
 
         //OUTTAKE
-        if(gamepad2.left_bumper){
-            outake.forward();
-        } else {
-            outake.stop();
-        }
+        //We are just going to tie this directly to the joystick because lack of buttons
+        outake.setPower(-gamepad2.left_stick_y);
 
         //GRABBER
 
-        if(gamepad2.right_bumper&&!bounce1){
-            moveGrabber();
-            bounce1=true;
+        if(gamepad2.left_bumper){
+            grabber.open();
         }
-        else if(!gamepad2.left_bumper){
-            bounce1=false;
+        else if(!gamepad2.right_bumper){
+            grabber.close();
         }
 
         //LIFT
@@ -154,13 +150,15 @@ public class TeleOpReverseStacking extends OpMode {
         }
 
         //DRIVE
-
         output = drive.drive(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
 
         left_front_drive.setPower(output[0]);
         left_back_drive.setPower(output[1]);
         right_front_drive.setPower(output[2]);
         right_back_drive.setPower(output[3]);
+
+        //OTHER
+        controlSound();
     }
 
     @Override
@@ -173,7 +171,28 @@ public class TeleOpReverseStacking extends OpMode {
         stopDrive();
     }
 
+    private void controlSound(){
+        if(!soundChanged){
+            mego.pause();
+            soundChanged = true;
+        } else if(soundChanged){
+            mego.play();
+            soundChanged = false;
+        }
+    }
+
+    private void checkSound(){
+        if(gamepad1.x&&!bounce1){
+            controlSound();
+            bounce1=true;
+        }
+        else if(!gamepad1.x){
+            bounce1=false;
+        }
+    }
+
     //Since this is all one class, I'm adding subsystems here
+    @SuppressWarnings("WeakerAccess")
     static class Intake {
         private ExpansionHubMotor left_intake, right_intake;
 
@@ -233,6 +252,7 @@ public class TeleOpReverseStacking extends OpMode {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     static class Grabber {
         private Servo grabber;
         private ExpansionHubMotor lift_left, lift_right;
