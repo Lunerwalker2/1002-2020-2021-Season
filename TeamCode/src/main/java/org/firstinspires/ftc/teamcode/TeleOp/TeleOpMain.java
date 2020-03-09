@@ -4,6 +4,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
@@ -79,11 +80,17 @@ public class TeleOpMain extends OpMode {
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         stopDrive();
+
+        //Nintendo Pro
+        //Input device ID: bus 0x3 vendor 0x57e product 0x2009 version 0x8111
+
+        //I think this could work
+        Gamepad.enableWhitelistFilter(0x57e, 0x2009);
     }
 
     @Override
     public void init_loop(){
-
+        //The big test
     }
 
     @Override
