@@ -6,9 +6,11 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +37,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double LATERAL_DISTANCE = 14.5138; // in; distance between the left and right wheels
     public static double FORWARD_OFFSET = 3.55598425197; // in; offset of the lateral wheel
 
-    private DcMotor leftEncoder, rightEncoder, frontEncoder;
+    private DcMotorEx leftEncoder, rightEncoder, frontEncoder;
+
+    private HardwareMap hardwareMap;
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
@@ -44,9 +48,11 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 new Pose2d(FORWARD_OFFSET, 0, Math.toRadians(90)) // front
         ));
 
-        leftEncoder = hardwareMap.dcMotor.get(HardwareNames.Odometry.LEFT_Y_ENCODER);
-        rightEncoder = hardwareMap.dcMotor.get(HardwareNames.Odometry.RIGHT_Y_ENCODER);
-        frontEncoder = hardwareMap.dcMotor.get(HardwareNames.Odometry.X_ENCODER);
+        this.hardwareMap = hardwareMap;
+
+        leftEncoder = findMotor(HardwareNames.Odometry.LEFT_Y_ENCODER);
+        rightEncoder = findMotor(HardwareNames.Odometry.RIGHT_Y_ENCODER);
+        frontEncoder = findMotor(HardwareNames.Odometry.X_ENCODER);
     }
 
     public static double encoderTicksToInches(int ticks) {
@@ -61,5 +67,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 encoderTicksToInches(rightEncoder.getCurrentPosition()),
                 encoderTicksToInches(frontEncoder.getCurrentPosition())
         );
+    }
+
+    private ExpansionHubMotor findMotor(String id){
+        return hardwareMap.get(ExpansionHubMotor.class, id);
     }
 }
