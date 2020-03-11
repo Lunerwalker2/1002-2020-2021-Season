@@ -116,7 +116,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         drive.initHardware();
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, HardwareNames.Sensors.LEFT_HUB_IMU);
+        imu = hardwareMap.get(BNO055IMU.class, HardwareNames.Sensors.RIGHT_HUB_IMU);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);

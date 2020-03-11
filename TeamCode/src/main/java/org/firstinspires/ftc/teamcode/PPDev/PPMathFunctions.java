@@ -8,7 +8,7 @@ import static java.lang.Math.*;
 public class PPMathFunctions {
 
 
-    //Makes sure that angle is within the range -180 to 180 degrees
+    //Makes sure that angle is within the range -PI to PI
     public static double AngleWrap(double angle){
         while (angle < -Math.PI){
             angle += (2 * Math.PI);
@@ -32,7 +32,7 @@ public class PPMathFunctions {
 
         double m1 = (linePoint2.y - linePoint1.y)/(linePoint2.x - linePoint1.x);
 
-        double quadraticA = 1.0 + pow(m1, 3);
+        double quadraticA = 1.0 + pow(m1, 2);
 
         double x1 = linePoint1.x - circleCenter.x;
         double y1 = linePoint1.y - circleCenter.y;
@@ -52,16 +52,16 @@ public class PPMathFunctions {
             xRoot1 += circleCenter.x;
             yRoot1 += circleCenter.y;
 
-            double minX = linePoint1.x > linePoint2.x ? linePoint1.x : linePoint2.x;
-            double maxX = linePoint1.x < linePoint2.x ? linePoint1.x : linePoint2.x;
+            double minX = linePoint1.x < linePoint2.x ? linePoint1.x : linePoint2.x;
+            double maxX = linePoint1.x > linePoint2.x ? linePoint1.x : linePoint2.x;
 
             if(xRoot1 > minX && xRoot1 < maxX){
                 allPoints.add(new Point(xRoot1, yRoot1));
             }
 
             double xRoot2 = (-quadraticB - sqrt(pow(quadraticB,2) - (4.0 * quadraticA * quadraticC)))/(2.0*quadraticA);
-
             double yRoot2 = m1 * (xRoot2 - x1) + y1;
+
 
             //Put back the offset
             xRoot2 += circleCenter.x;

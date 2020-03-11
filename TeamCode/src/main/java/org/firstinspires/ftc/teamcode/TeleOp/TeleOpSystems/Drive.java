@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.MathThings;
 
 import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
@@ -20,7 +21,7 @@ public class Drive extends TeleOpSystem {
 
     private Func<Double> cubingFactor;
 
-    private static double[][] basic_matrix = {{1, 1, 1, 1}, {1, -1, 1, -1}, {1, 1, -1, -1}};
+    private static double[][] basic_matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
     public Drive(OpMode opMode){
         this(opMode, () -> opMode.gamepad1.left_bumper);

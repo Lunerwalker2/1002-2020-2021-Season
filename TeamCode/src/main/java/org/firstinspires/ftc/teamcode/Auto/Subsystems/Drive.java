@@ -9,7 +9,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.MathThings;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
@@ -19,10 +21,19 @@ import java.util.List;
 public class Drive extends Subsystem {
 
 
+    //Components for PP
+    public static double movement_x;
+    public static double movement_y;
+    public static double movement_turn;
+
+
 
     private ExpansionHubMotor left_front_drive,left_back_drive, right_front_drive, right_back_drive;
 
     private List<ExpansionHubMotor> motors = Arrays.asList(left_front_drive, left_back_drive, right_front_drive, right_back_drive);
+
+
+    private final double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
 
 
@@ -44,8 +55,15 @@ public class Drive extends Subsystem {
     }
 
 
+    //Updates using the movement components
+    public void update(){
+        double[] output = MathThings.m_v_mult(matrix, new double[] {movement_x, movement_y, movement_turn});
+        setPower(output);
+    }
 
-    public ExpansionHubMotor findMotor(String id){
+
+
+    private ExpansionHubMotor findMotor(String id){
         return hardwareMap.get(ExpansionHubMotor.class, id);
     }
 

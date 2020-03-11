@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
+import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
@@ -22,9 +23,7 @@ public class TeleOpMain extends OpMode {
     private ExpansionHubMotor left_front_drive, left_back_drive, right_front_drive, right_back_drive;
 
 
-    private final double[][] matrix = {{1, 1, 1, 1}, {1, -1, 1, -1}, {1, 1, -1, -1}};
-
-    private double[] output;
+    private final double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
 
     private ArrayList<TeleOpSystem> systems = new ArrayList<>();
@@ -113,7 +112,7 @@ public class TeleOpMain extends OpMode {
             system.update();
         }
 
-        output = drive.drive(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
+        double[] output = drive.drive(new double[]{gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
 
         left_front_drive.setPower(output[0]);
         left_back_drive.setPower(output[1]);

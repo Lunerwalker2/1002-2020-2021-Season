@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.AssetsTrajectoryManager;
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
+import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
@@ -34,9 +35,7 @@ public class TeleOpReverseStacking extends OpMode {
     private Outake outake;
     private Grabber grabber;
 
-    private final double[][] matrix = {{1, 1, 1, 1}, {1, -1, 1, -1}, {1, 1, -1, -1}};
-
-    private double[] output;
+    private final double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
     private ArrayList<TeleOpSystem> systems = new ArrayList<>();
 
@@ -150,7 +149,7 @@ public class TeleOpReverseStacking extends OpMode {
         }
 
         //DRIVE
-        output = drive.drive(new double[] {gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
+        double[] output = drive.drive(new double[]{gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
 
         left_front_drive.setPower(output[0]);
         left_back_drive.setPower(output[1]);
