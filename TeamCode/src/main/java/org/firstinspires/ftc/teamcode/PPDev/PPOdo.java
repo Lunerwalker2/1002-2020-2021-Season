@@ -43,11 +43,11 @@ public class PPOdo {
 
     private HeadingMode headingMode;
 
-    public static final double TICKS_PER_REV = 1440;
-    public static final double WHEEL_RADIUS = 1.41732283465; // in
+    private static final double TICKS_PER_REV = 1440;
+    private static final double WHEEL_RADIUS = 1.41732283465; // in
 
-    public static final double LATERAL_DISTANCE = 14.5138; // in; distance between the left and right wheels
-    public static final double FORWARD_OFFSET = 3.55598425197; // in; offset of the lateral wheel
+    private static final double LATERAL_DISTANCE = 14.5138; // in; distance between the left and right wheels
+    private static final double FORWARD_OFFSET = 3.55598425197; // in; offset of the lateral wheel
 
     /**
      * USE RADIANS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -130,7 +130,7 @@ public class PPOdo {
         }
     }
 
-    public static double encoderTicksToInches(double ticks) {
+    private static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * ticks / TICKS_PER_REV;
     }
 

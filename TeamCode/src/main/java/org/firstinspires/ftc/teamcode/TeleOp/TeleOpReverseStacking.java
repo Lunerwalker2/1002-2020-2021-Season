@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.AssetsTrajectoryMana
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
 import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.MathThings;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
@@ -34,6 +35,8 @@ public class TeleOpReverseStacking extends OpMode {
     private Intake intake;
     private Outake outake;
     private Grabber grabber;
+
+
 
     private final double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
@@ -257,7 +260,9 @@ public class TeleOpReverseStacking extends OpMode {
         private ExpansionHubMotor lift_left, lift_right;
         private DigitalChannel left_switch, right_switch;
 
-        private static final double OPEN_POSITION = 0;
+
+
+        public static final double OPEN_POSITION = 0;
         private static final double CLOSE_POSITION = 1;
 
         Grabber(HardwareMap hardwareMap){

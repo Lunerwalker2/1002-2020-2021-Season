@@ -29,6 +29,7 @@ public class PPMain extends LinearOpMode {
     public void runOpMode(){
 
         odo = new PPOdo(hardwareMap, starting_position, PPOdo.HeadingMode.HEADING_FROM_ENCODERS);
+        drive = new Drive(this);
 
         drive.initHardware();
         drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

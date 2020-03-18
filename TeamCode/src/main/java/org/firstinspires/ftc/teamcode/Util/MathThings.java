@@ -4,7 +4,6 @@ import com.arcrobotics.ftclib.geometry.Vector2d;
 
 public class MathThings {
 
-
     public static double[] m_v_mult(double[][] m, double[] v) {
         double[] out = new double[4];
         out[0] = v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0];

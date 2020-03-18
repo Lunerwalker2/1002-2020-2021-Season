@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.Auto.Placeholder;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
 import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
@@ -16,7 +18,9 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 import java.util.ArrayList;
 import java.util.List;
 
+@TeleOp(name="Main TeleOp")
 public class TeleOpMain extends OpMode {
+
 
     //Drive motors are going to stay here (this could be changed, but I want to keep track of them)
 

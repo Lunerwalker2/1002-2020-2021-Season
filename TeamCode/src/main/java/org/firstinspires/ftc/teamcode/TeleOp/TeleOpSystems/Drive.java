@@ -16,7 +16,6 @@ import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
 public class Drive extends TeleOpSystem {
 
 
-
     private Func<Boolean> slowModeOn;
 
     private Func<Double> cubingFactor;
