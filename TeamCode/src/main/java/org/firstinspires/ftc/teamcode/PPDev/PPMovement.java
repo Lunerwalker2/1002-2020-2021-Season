@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.PPDev;
 
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.PPDev.PPAuto.PositionalMarker;
 import org.opencv.core.Point;
 import java.util.ArrayList;
 
@@ -33,6 +36,11 @@ public class PPMovement {
 
     //Optimal direction is forward (even though it's holonomic)
 
+
+    public static void followCurve(ListMultimap<CurvePoint, PositionalMarker> allPoints, double followingAngle){
+        followCurve(Lists.newArrayList(allPoints.keySet().iterator()), followingAngle);
+    }
+
     public static void followCurve(ArrayList<CurvePoint> allPoints, double followingAngle) {
 
         CurvePoint followMe = getFollowPointPath(allPoints, new Point(world_x_position, world_y_position), allPoints.get(0).followDistance);
@@ -41,6 +49,8 @@ public class PPMovement {
 
         goToPosition(followMe.x, followMe.y, followMe.moveSpeed, followingAngle, followMe.turnSpeed);
     }
+
+
 
 
     public static CurvePoint getFollowPointPath(ArrayList<CurvePoint> pathPoints, Point robotLocation, double followRadius) {

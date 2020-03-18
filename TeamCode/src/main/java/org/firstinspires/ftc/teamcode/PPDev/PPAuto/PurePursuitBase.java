@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.PPDev.PPAuto;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,32 +12,46 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Auto.Subsystems.Drive;
 import org.firstinspires.ftc.teamcode.PPDev.CurvePoint;
+import org.firstinspires.ftc.teamcode.PPDev.PPMovement;
 import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
 
+import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.followCurve;
+import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.withinRangeOfEnd;
+import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_x_position;
+import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_y_position;
+import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_angle_deg;
+import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_angle_rad;
+
+import java.util.ArrayList;
 import java.util.EnumMap;
 
 
-public abstract class PurePursuitBase extends LinearOpMode {
+public abstract class PurePursuitBase<K extends Enum<K>> extends LinearOpMode {
 
+    //The minimum distance to be to trigger a marker associated with a CurvePoint (inches)
+    private static double markerDistance = 5;
 
+    //Boolean to stop the current path in it's tracks (only use sparingly)
+    private static boolean stopCurrentpath = false;
 
     //The odometry object
-    PPOdo odometry;
+    public PPOdo odometry;
 
 
     //The drive class
-    Drive drive;
+    public Drive drive;
 
     //The starting position of the robot (use inches and the origin at the red loading zone and measured in inches. heading in radians
     private Pose2d starting_position = new Pose2d(0, 0, new Rotation2d(0.5));
 
 
     //The MultiMap that holds the paths ( CurvePoints and the "markers" (experimental))
-    public void setPaths(EnumMap<?, ArrayListMultimap<CurvePoint, PositionalMarker>> paths){
+    public void setPaths(EnumMap<K, ListMultimap<CurvePoint, PositionalMarker>> paths){
         this.paths = paths;
     }
 
-    private EnumMap<?, ArrayListMultimap<CurvePoint, PositionalMarker>> paths;
+    private EnumMap<K, ListMultimap<CurvePoint, PositionalMarker>> paths;
+    private ListMultimap<CurvePoint, PositionalMarker> currentPath;
 
     public void setStartingPosition(Pose2d starting_position){
         this.starting_position = starting_position;
@@ -50,7 +66,49 @@ public abstract class PurePursuitBase extends LinearOpMode {
         drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         drive.reverseRightSide();
         drive.stop();
+    }
 
+    public void loadAndStart(K path){
+        currentPath = paths.get(path);
+        PPMovement.followCurve(currentPath, Math.toRadians(90));
+    }
+
+    //Due to the rules of the Google Guava library, any MultiMap must have at least one value for every key
+    //Obviously, that doesn't help if there are no markers for the point, so this is a convenient way to get around that
+    public static PositionalMarker addNothing(){
+        return () -> {};
+    }
+
+    public void update(){
+        odometry.update();
+        //Check all the points in the path and see if we are close enough to trigger any markers
+        currentPath.keySet().forEach((key) -> {
+            if(shouldTriggerMarkers(key)){
+                currentPath.get(key).forEach(PositionalMarker::act);
+            }
+        });
+        followCurve(currentPath, Math.toRadians(90));
+        if(!withinRangeOfEnd && !stopCurrentpath){
+            drive.update();
+        } else {
+            drive.stopDrive();
+        }
+    }
+
+    public void stopCurrentPath(){
+        stopCurrentpath = true;
+    }
+
+    public void allowCurrentPath(){
+        stopCurrentpath = false;
+    }
+
+    public boolean currentPathDone(){
+        return withinRangeOfEnd;
+    }
+
+    public static boolean shouldTriggerMarkers(CurvePoint markerPoint){
+        return (Math.hypot(markerPoint.x - world_x_position, markerPoint.y - world_y_position) <= markerDistance);
     }
 
 
