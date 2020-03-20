@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.PPDev;
+package org.firstinspires.ftc.teamcode.Robot;
 
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
@@ -7,20 +7,25 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
-import java.util.function.DoubleSupplier;
+public class Odometry extends Component {
 
 
-/**
- * ALL UNITS ARE IN INCHES!!!!!
- */
-public class PPOdo {
+
+
+
+
+
+
+
+    public Odometry(Robot robot){
+        super(robot);
+
+    }
+
 
 
     public enum HeadingMode {
@@ -41,7 +46,7 @@ public class PPOdo {
     //Not really needed
     private BNO055IMU imu;
 
-    private HeadingMode headingMode;
+    private PPOdo.HeadingMode headingMode;
 
     private static final double TICKS_PER_REV = 1440;
     private static final double WHEEL_RADIUS = 1.41732283465; // in
@@ -52,7 +57,8 @@ public class PPOdo {
     /**
      * USE RADIANS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      */
-    public PPOdo(HardwareMap hardwareMap, Pose2d startingPosition, HeadingMode headingMode){
+    public Odometry(Robot robot, Pose2d startingPosition, PPOdo.HeadingMode headingMode){
+        super(robot);
         this.headingMode = headingMode;
         setUp(hardwareMap);
         odometry = new ConstantVeloMecanumOdometry(startingPosition.getRotation(), startingPosition, LATERAL_DISTANCE, FORWARD_OFFSET);
@@ -84,9 +90,7 @@ public class PPOdo {
     public void update(){
         Pose2d newPosition = odometry.update(
                 //Absolute heading = rightY minus leftY, divided by the trackwidth
-                Rotation2d.fromDegrees(
-                        (getRightYInches() - getLeftYInches())/LATERAL_DISTANCE
-                ),
+                getGyroHeading(),
                 getLeftYInches(),
                 getRightYInches(),
                 getXInches()
@@ -98,27 +102,27 @@ public class PPOdo {
         world_angle_deg = newPosition.getRotation().getDegrees();
     }
 
-    public int getLeftYPos(){
+    private int getLeftYPos(){
         return left_y_encoder.getCurrentPosition();
     }
 
-    public double getLeftYInches(){
+    private double getLeftYInches(){
         return encoderTicksToInches(getLeftYPos());
     }
 
-    public double getRightYPos(){
+    private double getRightYPos(){
         return right_y_encoder.getCurrentPosition();
     }
 
-    public double getRightYInches(){
+    private double getRightYInches(){
         return encoderTicksToInches(getRightYPos());
     }
 
-    public double getXPos(){
+    private double getXPos(){
         return x_encoder.getCurrentPosition();
     }
 
-    public double getXInches(){
+    private double getXInches(){
         return encoderTicksToInches(getXPos());
     }
 
@@ -133,7 +137,4 @@ public class PPOdo {
     private static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * ticks / TICKS_PER_REV;
     }
-
-
-
 }

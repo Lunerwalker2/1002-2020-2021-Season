@@ -1,14 +1,10 @@
-package org.firstinspires.ftc.teamcode.Auto.Subsystems;
+package org.firstinspires.ftc.teamcode.Auto.hardware;
 
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.firstinspires.ftc.teamcode.Util.MathThings;

@@ -2,15 +2,11 @@ package org.firstinspires.ftc.teamcode.PPDev.PPAuto;
 
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Auto.Subsystems.Drive;
+import org.firstinspires.ftc.teamcode.Auto.hardware.Drive;
 import org.firstinspires.ftc.teamcode.PPDev.CurvePoint;
 import org.firstinspires.ftc.teamcode.PPDev.PPMovement;
 import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
@@ -19,10 +15,7 @@ import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.followCurve;
 import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.withinRangeOfEnd;
 import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_x_position;
 import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_y_position;
-import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_angle_deg;
-import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_angle_rad;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 
 
@@ -68,6 +61,7 @@ public abstract class PurePursuitBase<K extends Enum<K>> extends LinearOpMode {
         drive.stop();
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void loadAndStart(K path){
         currentPath = paths.get(path);
         PPMovement.followCurve(currentPath, Math.toRadians(90));
@@ -88,7 +82,7 @@ public abstract class PurePursuitBase<K extends Enum<K>> extends LinearOpMode {
             }
         });
         followCurve(currentPath, Math.toRadians(90));
-        if(!withinRangeOfEnd && !stopCurrentpath){
+        if(!currentPathDone() && !stopCurrentpath){
             drive.update();
         } else {
             drive.stopDrive();

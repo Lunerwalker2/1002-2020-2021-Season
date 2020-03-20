@@ -1,9 +1,7 @@
-package org.firstinspires.ftc.teamcode.Auto.Subsystems;
+package org.firstinspires.ftc.teamcode.Auto.hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public abstract class Subsystem {
 

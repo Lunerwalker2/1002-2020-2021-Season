@@ -5,16 +5,13 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
-import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -22,9 +19,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,8 +35,9 @@ public class MineralTracking extends LinearOpMode
     private StageSwitchingPipeline stageSwitchingPipeline;
 
     private enum Colors {
-        LOGO(new Scalar(0, 255, 0)),
-        CONTOUR_LINES(new Scalar(10, 200, 240));
+        LABEL(new Scalar(0, 255, 0)),
+        CONTOUR_LINES(new Scalar(10, 220, 20)),
+        BOUNDING_CIRCLE(new Scalar(10, 240, 20));
 
         final Scalar scalar;
 
@@ -50,13 +46,13 @@ public class MineralTracking extends LinearOpMode
         }
     }
 
-    private static final Point LOGO = new Point((640 /2) - 120 , 90);
 
-    public static double thresholdValue = 102;
+    public static double thresholdValue = 99;
 
-    public static int medianFilterKernal = 5;
+    public static double brightnessAlpha = 1.45;
 
-    public static double brightnessAlpha = 1.2;
+    public static double minimumRadius = 90;
+
 
 
     @Override
@@ -109,24 +105,42 @@ public class MineralTracking extends LinearOpMode
     static class StageSwitchingPipeline extends OpenCvPipeline
     {
         Mat yCbCrChan2Mat = new Mat();
-
-        Mat HSVMat = new Mat();
-
-        Mat thresholdMat = new Mat();
-        Mat contoursOnFrameMat = new Mat();
         List<MatOfPoint> contoursList = new ArrayList<>();
         int numContoursFound;
         Mat blurred = new Mat();
+        Mat boundingBoxesDrawn = new Mat();
+        Mat cannyOutput = new Mat();
+
+        float[][] radius;
+        Point[] centers;
 
 
 
         enum Stage
         {
-            YCbCr_CHAN2,
-            THRESHOLD,
-            CONTOURS_OVERLAYED_ON_FRAME,
-            MEDIAN_BLUR,
-            RAW_IMAGE
+            RAW_IMAGE("Raw Image"),
+            GAUSSIAN_BLUR("Gaussian Blur"),
+            YCbCr_CHAN2("Extracted Cb Channel"),
+            CANNY_EDGE_DETECTION("Canny Edge Detection"),
+            BOUNDING_BOXES_DRAWN("Bounding Boxes");
+
+            String text;
+
+            public void putText(Mat input){
+                Imgproc.putText(
+                        input,
+                        this.text,
+                        new Point(70, input.cols()+20),
+                        Imgproc.FONT_HERSHEY_SIMPLEX,
+                        1,
+                        Colors.LABEL.scalar,
+                        5
+                );
+            }
+
+            Stage(String text){
+                this.text = text;
+            }
 
         }
 
@@ -154,25 +168,31 @@ public class MineralTracking extends LinearOpMode
         }
 
         private void smoothImage(Mat input){
-            Imgproc.medianBlur(
+            Imgproc.GaussianBlur(
                     input,
                     blurred,
-                    medianFilterKernal
+                    new Size(5, 5),
+                    0,
+                    0
             );
+        }
+
+        private void drawCircles(int i){
+            if(isCircleLargeEnough(radius[i][0])) {
+                Imgproc.circle(boundingBoxesDrawn, centers[i], (int) radius[i][0], Colors.BOUNDING_CIRCLE.scalar, 3);
+            }
+        }
+
+        private boolean isCircleLargeEnough(double radius){
+            double diameter = radius*radius;
+            return (diameter > minimumRadius);
         }
 
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
 
             contoursList.clear();
-
-
-            /*
-             * This pipeline finds the contours of yellow blobs such as the Gold Mineral
-             * from the Rover Ruckus game.
-             */
 
             smoothImage(input);
 
@@ -181,46 +201,65 @@ public class MineralTracking extends LinearOpMode
 
             yCbCrChan2Mat.convertTo(yCbCrChan2Mat, -1, brightnessAlpha);
 
-            //Extract the
+            //Extract the Cb channel
             Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);
-            Imgproc.threshold(yCbCrChan2Mat, thresholdMat, thresholdValue, 255, Imgproc.THRESH_BINARY_INV);
-            Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-            numContoursFound = contoursList.size();
-            input.copyTo(contoursOnFrameMat);
-            Imgproc.drawContours(contoursOnFrameMat, contoursList, -1, new Scalar(0, 0, 255), 3, 8);
+
+            Imgproc.Canny(yCbCrChan2Mat, cannyOutput, thresholdValue, thresholdValue * 2);
+
+            Imgproc.findContours(cannyOutput, contoursList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+            MatOfPoint2f[] contoursPoly = new MatOfPoint2f[contoursList.size()];
+            centers = new Point[contoursList.size()];
+            radius = new float[contoursList.size()][1];
+
+            for (int i = 0; i < contoursList.size(); i++) {
+                contoursPoly[i] = new MatOfPoint2f();
+                Imgproc.approxPolyDP(new MatOfPoint2f(contoursList.get(i).toArray()), contoursPoly[i], 5, true);
+                centers[i] = new Point();
+                Imgproc.minEnclosingCircle(contoursPoly[i], centers[i], radius[i]);
+            }
+
+            List<MatOfPoint> contoursPolyList = new ArrayList<>(contoursPoly.length);
+            for (MatOfPoint2f poly : contoursPoly) {
+                contoursPolyList.add(new MatOfPoint(poly.toArray()));
+            }
+
+            input.copyTo(boundingBoxesDrawn);
+
+            for (int i = 0; i < contoursList.size(); i++) {
+                Imgproc.drawContours(boundingBoxesDrawn, contoursPolyList, i, Colors.CONTOUR_LINES.scalar, 2);
+                drawCircles(i);
+            }
+            for (MatOfPoint2f mat : contoursPoly) {
+                mat.release();
+            }
+            contoursPolyList.forEach(MatOfPoint::release);
 
 
-
-
-
-
-            switch (stageToRenderToViewport)
-            {
-                case YCbCr_CHAN2:
-                {
+            switch (stageToRenderToViewport) {
+                case YCbCr_CHAN2: {
+                    stageToRenderToViewport.putText(yCbCrChan2Mat);
                     return yCbCrChan2Mat;
                 }
-
-                case THRESHOLD:
-                {
-                    return thresholdMat;
-                }
-
-                case CONTOURS_OVERLAYED_ON_FRAME:
-                {
-                    return contoursOnFrameMat;
-                }
-
-                case RAW_IMAGE:
-                {
+                case RAW_IMAGE: {
+                    stageToRenderToViewport.putText(input);
                     return input;
                 }
 
-                case MEDIAN_BLUR:
+                case GAUSSIAN_BLUR: {
+                    stageToRenderToViewport.putText(blurred);
                     return blurred;
+                }
 
-                default:
-                {
+                case CANNY_EDGE_DETECTION:
+                    stageToRenderToViewport.putText(cannyOutput);
+                    return cannyOutput;
+
+                case BOUNDING_BOXES_DRAWN:
+                    stageToRenderToViewport.putText(boundingBoxesDrawn);
+                    return boundingBoxesDrawn;
+
+                default: {
                     return input;
                 }
             }

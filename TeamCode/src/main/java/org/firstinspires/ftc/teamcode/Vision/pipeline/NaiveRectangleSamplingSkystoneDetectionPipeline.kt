@@ -71,7 +71,7 @@ private val markingRectangles = samplePointPercentages.map {
         Core.extractChannel(matYCrCb, matCb, 2)
 
         // Then the sample areas from the Cb channel
-        var subMats = samplePoints.map {
+        val subMats = samplePoints.map {
         matCb.submat(Rect(it[0], it[1]))
         }
 

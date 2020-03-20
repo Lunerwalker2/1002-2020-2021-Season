@@ -6,11 +6,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 
 import org.firstinspires.ftc.teamcode.PPDev.CurvePoint;
-
-import java.util.ArrayList;
 import java.util.EnumMap;
 
-import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.followCurve;
 
 enum Paths {
     GO_TO_LEFT_STONE(MultimapBuilder.hashKeys().arrayListValues().build()),
@@ -26,9 +23,11 @@ enum Paths {
 public class PPMain extends PurePursuitBase<Paths> {
 
 
-
     //The starting position of the robot (use inches and the origin at the red loading zone and measured in inches. heading in radians
     private Pose2d starting_position = new Pose2d(0, 0, new Rotation2d(0.5));
+
+
+    private Paths currentPathState;
 
 
     @Override
@@ -74,21 +73,29 @@ public class PPMain extends PurePursuitBase<Paths> {
         paths.put(Paths.GO_TO_RIGHT_STONE, Paths.GO_TO_RIGHT_STONE.path);
 
 
+        setPaths(paths);
 
-        ArrayList<CurvePoint> allPoints = new ArrayList<>();
-        allPoints.add(new CurvePoint(0.0, 0.0, 1.0, 1.0, 50.0, Math.toRadians(50),1.0));
-        allPoints.add(new CurvePoint(0.0, 0.0, 1.0, 1.0, 50.0, Math.toRadians(50),1.0));
-        allPoints.add(new CurvePoint(0.0, 0.0, 1.0, 1.0, 50.0, Math.toRadians(50),1.0));
-        allPoints.add(new CurvePoint(0.0, 0.0, 1.0, 1.0, 50.0, Math.toRadians(50),1.0));
-        allPoints.add(new CurvePoint(0.0, 0.0, 1.0, 1.0, 50.0, Math.toRadians(50),1.0));
-        allPoints.add(new CurvePoint(0.0, 0.0, 1.0, 1.0, 50.0, Math.toRadians(50),1.0));
+
+
 
         waitForStart();
 
-        while(opModeIsActive()) {
+        currentPathState = Paths.GO_TO_CENTER_STONE;
+        loadAndStart(Paths.GO_TO_CENTER_STONE);
 
+        while(opModeIsActive()) {
+            if(currentPathState == Paths.GO_TO_CENTER_STONE){
+                if(currentPathDone()){
+                    loadAndStart(Paths.GO_TO_LEFT_STONE);
+                    currentPathState = Paths.GO_TO_LEFT_STONE;
+                }
+            }
+
+            else if(currentPathState == Paths.GO_TO_LEFT_STONE){
+
+            }
         }
 
-        drive.stop();
+        stopCurrentPath();
     }
 }

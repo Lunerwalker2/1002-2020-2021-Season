@@ -13,9 +13,9 @@ import static org.firstinspires.ftc.teamcode.PPDev.PPMathFunctions.AngleWrap;
 import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_angle_rad;
 import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_x_position;
 import static org.firstinspires.ftc.teamcode.PPDev.PPOdo.world_y_position;
-import static org.firstinspires.ftc.teamcode.Auto.Subsystems.Drive.movement_x;
-import static org.firstinspires.ftc.teamcode.Auto.Subsystems.Drive.movement_y;
-import static org.firstinspires.ftc.teamcode.Auto.Subsystems.Drive.movement_turn;
+import static org.firstinspires.ftc.teamcode.Auto.hardware.Drive.movement_x;
+import static org.firstinspires.ftc.teamcode.Auto.hardware.Drive.movement_y;
+import static org.firstinspires.ftc.teamcode.Auto.hardware.Drive.movement_turn;
 
 public class PPMovement {
 
