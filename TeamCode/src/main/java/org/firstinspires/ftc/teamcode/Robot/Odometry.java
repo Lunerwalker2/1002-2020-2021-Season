@@ -6,7 +6,7 @@ import com.arcrobotics.ftclib.kinematics.ConstantVeloMecanumOdometry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
+import org.firstinspires.ftc.teamcode.Odometry.OdometryKt;
 import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.openftc.revextensions2.ExpansionHubMotor;
@@ -14,19 +14,9 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 public class Odometry extends Component {
 
 
-
-
-
-
-
-
-
     public Odometry(Robot robot){
         super(robot);
-
     }
-
-
 
     public enum HeadingMode {
         HEADING_FROM_IMU,
@@ -39,29 +29,31 @@ public class Odometry extends Component {
     public static double world_angle_rad;
     public static double world_angle_deg;
 
-    private ConstantVeloMecanumOdometry odometry;
 
     private ExpansionHubMotor left_y_encoder, right_y_encoder, x_encoder;
 
     //Not really needed
     private BNO055IMU imu;
 
-    private PPOdo.HeadingMode headingMode;
 
-    private static final double TICKS_PER_REV = 1440;
-    private static final double WHEEL_RADIUS = 1.41732283465; // in
-
-    private static final double LATERAL_DISTANCE = 14.5138; // in; distance between the left and right wheels
-    private static final double FORWARD_OFFSET = 3.55598425197; // in; offset of the lateral wheel
+    //The odometry object
+    private OdometryKt odometry;
 
     /**
-     * USE RADIANS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * USE RADIANS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      */
-    public Odometry(Robot robot, Pose2d startingPosition, PPOdo.HeadingMode headingMode){
+    public Odometry(Robot robot, Pose2d startingPosition){
         super(robot);
-        this.headingMode = headingMode;
         setUp(hardwareMap);
-        odometry = new ConstantVeloMecanumOdometry(startingPosition.getRotation(), startingPosition, LATERAL_DISTANCE, FORWARD_OFFSET);
+
+        odometry = new OdometryKt(this::getLeftYPos, this::getRightYPos, this::getXPos);
+        odometry.setPoseEstimate(new com.acmerobotics.roadrunner.geometry.Pose2d(
+                startingPosition.getTranslation().getX(),
+                startingPosition.getTranslation().getY(),
+                startingPosition.getHeading()
+        ));
+
+
         //Update all the globals
         world_x_position = startingPosition.getTranslation().getX();
         world_y_position = startingPosition.getTranslation().getY();
@@ -88,13 +80,7 @@ public class Odometry extends Component {
     }
 
     public void update(){
-        Pose2d newPosition = odometry.update(
-                //Absolute heading = rightY minus leftY, divided by the trackwidth
-                getGyroHeading(),
-                getLeftYInches(),
-                getRightYInches(),
-                getXInches()
-        );
+        Pose2d newPosition = new Pose2d();
         //Update all the globals
         world_x_position = newPosition.getTranslation().getX();
         world_y_position = newPosition.getTranslation().getY();
@@ -106,35 +92,15 @@ public class Odometry extends Component {
         return left_y_encoder.getCurrentPosition();
     }
 
-    private double getLeftYInches(){
-        return encoderTicksToInches(getLeftYPos());
-    }
 
-    private double getRightYPos(){
+    private int getRightYPos(){
         return right_y_encoder.getCurrentPosition();
     }
 
-    private double getRightYInches(){
-        return encoderTicksToInches(getRightYPos());
-    }
 
-    private double getXPos(){
+    private int getXPos(){
         return x_encoder.getCurrentPosition();
     }
 
-    private double getXInches(){
-        return encoderTicksToInches(getXPos());
-    }
 
-    public Rotation2d getGyroHeading(){
-        switch (headingMode){
-            case HEADING_FROM_IMU: return new Rotation2d(imu.getAngularOrientation().firstAngle);
-            case HEADING_FROM_ENCODERS: return Rotation2d.fromDegrees((getRightYInches() - getLeftYInches())/LATERAL_DISTANCE);
-            default: return null;
-        }
-    }
-
-    private static double encoderTicksToInches(double ticks) {
-        return WHEEL_RADIUS * 2 * Math.PI * ticks / TICKS_PER_REV;
-    }
 }

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Vision.pipeline;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +12,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -32,18 +35,24 @@ import java.util.List;
 public class MineralTracking extends LinearOpMode
 {
     private OpenCvCamera camera;
-    private StageSwitchingPipeline stageSwitchingPipeline;
+    private MineralTracker stageSwitchingPipeline;
 
     private enum Colors {
         LABEL(new Scalar(0, 255, 0)),
         CONTOUR_LINES(new Scalar(10, 220, 20)),
-        BOUNDING_CIRCLE(new Scalar(10, 240, 20));
+        BOUNDING_CIRCLE(new Scalar(10, 240, 20)),
+        BOUNDING_RECT(BOUNDING_CIRCLE.scalar);
 
         final Scalar scalar;
 
         Colors(Scalar scalar) {
             this.scalar = scalar;
         }
+    }
+
+    public enum MineralTrackingType {
+        GOLD,
+        SILVER
     }
 
 
@@ -80,7 +89,7 @@ public class MineralTracking extends LinearOpMode
                 .getInstance()
                 .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         camera.openCameraDevice();
-        stageSwitchingPipeline = new StageSwitchingPipeline();
+        stageSwitchingPipeline = new MineralTracker(MineralTrackingType.SILVER);
         camera.setPipeline(stageSwitchingPipeline);
         camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
 
@@ -90,6 +99,24 @@ public class MineralTracking extends LinearOpMode
 
         while (opModeIsActive())
         {
+            TelemetryPacket packet = new TelemetryPacket();
+
+            /*
+                    opMode.telemetry.addData("Frame Count", () -> camera.getFrameCount());
+        opMode.telemetry.addData("FPS", () -> String.format(Locale.US,"%.2f", camera.getFps()));
+        opMode.telemetry.addData("Total frame time ms", () ->  camera.getTotalFrameTimeMs());
+        opMode.telemetry.addData("Pipeline time ms", () -> camera.getPipelineTimeMs());
+        opMode.telemetry.addData("Overhead time ms", () -> camera.getOverheadTimeMs());
+        opMode.telemetry.addData("Theoretical max FPS", () -> camera.getCurrentPipelineMaxFps());
+             */
+            packet.put("Frame Count", camera.getFrameCount());
+            packet.put("Total frame time ms", camera.getTotalFrameTimeMs());
+            packet.put("Pipeline time ms", camera.getPipelineTimeMs());
+            packet.put("Overhead time ms", camera.getOverheadTimeMs());
+            packet.put("Theoretical max FPS", camera.getCurrentPipelineMaxFps());
+
+
+            FtcDashboard.getInstance().sendTelemetryPacket(packet);
             telemetry.addData("Num contours found", stageSwitchingPipeline.getNumContoursFound());
             telemetry.update();
             sleep(100);
@@ -102,19 +129,25 @@ public class MineralTracking extends LinearOpMode
      * particularly useful during pipeline development. We also show how
      * to get data from the pipeline to your OpMode.
      */
-    static class StageSwitchingPipeline extends OpenCvPipeline
+    static class MineralTracker extends OpenCvPipeline
     {
-        Mat yCbCrChan2Mat = new Mat();
+        Mat extractedChannel = new Mat();
         List<MatOfPoint> contoursList = new ArrayList<>();
         int numContoursFound;
         Mat blurred = new Mat();
         Mat boundingBoxesDrawn = new Mat();
         Mat cannyOutput = new Mat();
 
-        float[][] radius;
-        Point[] centers;
+        private float[][] radius;
+        private Point[] centers;
+        Rect[] boundRect;
+
+        private final MineralTrackingType mineralTrackingType;
 
 
+        public MineralTracker(MineralTrackingType type){
+            mineralTrackingType = type;
+        }
 
         enum Stage
         {
@@ -183,9 +216,19 @@ public class MineralTracking extends LinearOpMode
             }
         }
 
+        private void drawRectangles(int i){
+            if(isRectangleLargeEnough(boundRect[i])) {
+                Imgproc.rectangle(boundingBoxesDrawn, boundRect[i].tl(), boundRect[i].br(), Colors.BOUNDING_RECT.scalar, 3);
+            }
+        }
+
         private boolean isCircleLargeEnough(double radius){
-            double diameter = radius*radius;
+            double diameter = 2*radius;
             return (diameter > minimumRadius);
+        }
+
+        private boolean isRectangleLargeEnough(Rect rect){
+            return (rect.height > 90) && (rect.width > 90);
         }
 
 
@@ -197,24 +240,28 @@ public class MineralTracking extends LinearOpMode
             smoothImage(input);
 
             //Convert to YCrCb color space
-            Imgproc.cvtColor(blurred, yCbCrChan2Mat, Imgproc.COLOR_RGB2YCrCb);
+            Imgproc.cvtColor(blurred, extractedChannel, Imgproc.COLOR_RGB2YCrCb);
 
-            yCbCrChan2Mat.convertTo(yCbCrChan2Mat, -1, brightnessAlpha);
+            //Brighten up image
+            extractedChannel.convertTo(extractedChannel, -1, brightnessAlpha);
 
-            //Extract the Cb channel
-            Core.extractChannel(yCbCrChan2Mat, yCbCrChan2Mat, 2);
+            //Extract the channel: Cb for the gold, Y for the silver
+            int coi = (mineralTrackingType == MineralTrackingType.SILVER) ? 0 : 2;
+            Core.extractChannel(extractedChannel, extractedChannel, coi);
 
-            Imgproc.Canny(yCbCrChan2Mat, cannyOutput, thresholdValue, thresholdValue * 2);
+            Imgproc.Canny(extractedChannel, cannyOutput, thresholdValue, thresholdValue * 2);
 
             Imgproc.findContours(cannyOutput, contoursList, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
             MatOfPoint2f[] contoursPoly = new MatOfPoint2f[contoursList.size()];
             centers = new Point[contoursList.size()];
             radius = new float[contoursList.size()][1];
+            boundRect = new Rect[contoursList.size()];
 
             for (int i = 0; i < contoursList.size(); i++) {
                 contoursPoly[i] = new MatOfPoint2f();
                 Imgproc.approxPolyDP(new MatOfPoint2f(contoursList.get(i).toArray()), contoursPoly[i], 5, true);
+                boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
                 centers[i] = new Point();
                 Imgproc.minEnclosingCircle(contoursPoly[i], centers[i], radius[i]);
             }
@@ -228,8 +275,10 @@ public class MineralTracking extends LinearOpMode
 
             for (int i = 0; i < contoursList.size(); i++) {
                 Imgproc.drawContours(boundingBoxesDrawn, contoursPolyList, i, Colors.CONTOUR_LINES.scalar, 2);
-                drawCircles(i);
+                if(mineralTrackingType == MineralTrackingType.SILVER) drawCircles(i);
+                else drawRectangles(i);
             }
+
             for (MatOfPoint2f mat : contoursPoly) {
                 mat.release();
             }
@@ -238,8 +287,9 @@ public class MineralTracking extends LinearOpMode
 
             switch (stageToRenderToViewport) {
                 case YCbCr_CHAN2: {
-                    stageToRenderToViewport.putText(yCbCrChan2Mat);
-                    return yCbCrChan2Mat;
+                    if(mineralTrackingType == MineralTrackingType.SILVER) Imgproc.putText(extractedChannel, "Y Channel", new Point(70, input.cols()+20), Imgproc.FONT_HERSHEY_SIMPLEX, 1, Colors.LABEL.scalar, 5);
+                    else Imgproc.putText(extractedChannel, "Cb Channel", new Point(70, input.cols()+20), Imgproc.FONT_HERSHEY_SIMPLEX, 1, Colors.LABEL.scalar, 5);
+                    return extractedChannel;
                 }
                 case RAW_IMAGE: {
                     stageToRenderToViewport.putText(input);

@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.Vision;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.opencv.core.Mat;
+import org.openftc.easyopencv.OpenCvPipeline;
+
 
 @TeleOp(name = "OpenCv Stream")
 public class OpenCVStream extends LinearOpMode {
@@ -35,7 +38,16 @@ public class OpenCVStream extends LinearOpMode {
 
         vision.stopVision();
 
-
-
     }
+
+    static class UselessTesting extends OpenCvPipeline {
+
+
+        @Override
+        public Mat processFrame(Mat input){
+            return input;
+        }
+    }
+
+
 }

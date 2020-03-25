@@ -22,6 +22,8 @@ public abstract class Component {
     Gamepad gamepad1, gamepad2;
     HardwareMap hardwareMap;
 
+    static FtcDashboard dashboard = FtcDashboard.getInstance();
+
 
      Component(Robot robot) {
         this.robot = robot;

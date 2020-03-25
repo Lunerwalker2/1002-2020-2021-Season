@@ -73,4 +73,8 @@ public class DriveBase extends Component {
         right_front_drive.setPower(powers[2]);
         right_back_drive.setPower(powers[3]);
     }
+
+    public void stop(){
+        setPower(new double[] {0,0,0,0});
+    }
 }

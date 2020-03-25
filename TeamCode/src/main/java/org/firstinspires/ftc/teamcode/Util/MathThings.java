@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Util;
 
-import com.arcrobotics.ftclib.geometry.Vector2d;
 
 public class MathThings {
 
@@ -41,6 +40,21 @@ public class MathThings {
         while (angle >= 1.0) angle -= 2.0;
         while (angle < -1.0) angle += 2.0;
         return angle;
+    }
+
+    /**
+     * Focal length = (perceived (px) width * distance (in)) / width (in)
+     * @param focalLength focalLength
+     * @param knownWidthOfObject The known width of the object in inches
+     * @param seenPixelWidth The observed pixel width at the unknown distance
+     * @return The distance in inches
+     */
+    public static double distanceToObject(double knownWidthOfObject, double focalLength, double seenPixelWidth){
+        return (knownWidthOfObject * focalLength) / seenPixelWidth;
+    }
+
+    public static double focalLength(double seenPixelWidth, double knownDistance, double knownWidth){
+        return (seenPixelWidth * knownDistance) / knownWidth;
     }
 
 
