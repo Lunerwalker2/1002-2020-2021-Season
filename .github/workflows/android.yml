@@ -16,4 +16,4 @@ jobs:
     - name: Chmod Permissions #Gives gradle permissions
       run: chmod +x gradlew 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew :teamcode:build
