@@ -1,2 +1,2 @@
-include ':FtcRobotController'
+include ':FtcRobotController', ':MeepMeep-Core', ':MeepMeep-RoadRunner', ':testingMeepMeep'
 include ':TeamCode'

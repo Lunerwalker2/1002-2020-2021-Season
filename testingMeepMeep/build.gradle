@@ -1,0 +1,13 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.acmerobotics.roadrunner:core:0.5.0'
+
+    implementation project(":MeepMeep-RoadRunner") //Name of your MeepMeep-RoadRunner download
+    implementation project(":MeepMeep-Core") //Name of your MeepMeep-Core download
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"

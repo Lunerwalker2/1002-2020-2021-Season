@@ -30,6 +30,7 @@ public class Odometry extends Component {
     public static double world_angle_deg;
 
 
+    ///The odometers
     private ExpansionHubMotor left_y_encoder, right_y_encoder, x_encoder;
 
     //Not really needed
@@ -100,6 +101,10 @@ public class Odometry extends Component {
 
     private int getXPos(){
         return x_encoder.getCurrentPosition();
+    }
+
+    public OdometryKt getOdometryKt(){
+        return odometry;
     }
 
 

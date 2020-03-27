@@ -1,21 +1,26 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
 import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.WheelPowerCanvas;
+
+import static org.firstinspires.ftc.teamcode.Robot.DriveFields.movement_turn;
+import static org.firstinspires.ftc.teamcode.Robot.DriveFields.movement_x;
+import static org.firstinspires.ftc.teamcode.Robot.DriveFields.movement_y;
 
 public class Robot {
 
 
-    //Components for holonomic movement
-    public static double movement_x = 0;
-    public static double movement_y = 0;
-    public static double movement_turn = 0;
 
 
     //The OpMode
@@ -25,6 +30,12 @@ public class Robot {
     public DriveBase driveBase;
     public Odometry odometry;
     public BulkData bulkData;
+
+    //Ftc dashboard
+    private FtcDashboard dashboard = FtcDashboard.getInstance();
+
+    //The timer for the loop time
+    private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
 
     //The starting positions for the robot see the "skystoneField.png" picture for reference
@@ -53,6 +64,9 @@ public class Robot {
         } else {
             odometry = new Odometry(this,userStartingPosition);
         }
+
+        //Set dashboard update time
+        dashboard.setTelemetryTransmissionInterval(25);
     }
 
     //Called to update all the robot's components
@@ -63,11 +77,36 @@ public class Robot {
         driveBase.update();
 
         odometry.update();
+
+        compileTelemetry();
+        timer.reset();
     }
 
     //Called on stop() normally to stop all motion
     public void stop(){
         driveBase.stop();
+    }
+
+    //Compiles telemetry to both dashboard and telemetry
+    private void compileTelemetry(){
+        TelemetryPacket packet = new TelemetryPacket();
+
+        packet.put("Robot X", Odometry.world_x_position);
+        packet.put("Robot Y", Odometry.world_y_position);
+        packet.put("Robot Heading (deg)", Odometry.world_angle_deg);
+        packet.put("Robot Heading (rad)", Odometry.world_angle_rad);
+
+        packet.put("Movement X", movement_x);
+        packet.put("Movement Y", movement_y);
+        packet.put("Movement Turn", movement_turn);
+
+        packet.put("Loop Time", timer.milliseconds());
+
+        dashboard.sendTelemetryPacket(packet);
+    }
+
+    private void drawMovement(Canvas field){
+        WheelPowerCanvas.drawRobotMovement(field);
     }
 
 

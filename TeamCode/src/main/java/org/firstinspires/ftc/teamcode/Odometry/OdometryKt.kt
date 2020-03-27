@@ -25,14 +25,22 @@ class OdometryKt(val getLeftPosition: Func<Int>, val getRightPosition: Func<Int>
         }
     }
 
+    private var last_left_y = 0
+    private var last_right_y = 0
+    private var last_x = 0
+
 
     @NonNull
     override fun getWheelPositions(): List<Double> {
-        return listOf(
-                ticksToInches(getLeftPosition.value()),
-                ticksToInches(getRightPosition.value()),
-                ticksToInches(getCenterPosition.value()) //returns in radians
+        val positions = listOf(
+                ticksToInches(getLeftPosition.value() - last_left_y),
+                ticksToInches(getRightPosition.value() - last_right_y),
+                ticksToInches(getCenterPosition.value() - last_x) //returns in radians
         )
+        last_left_y = getLeftPosition.value()
+        last_right_y = getRightPosition.value()
+        last_x = getCenterPosition.value()
+        return positions;
     }
 
 }

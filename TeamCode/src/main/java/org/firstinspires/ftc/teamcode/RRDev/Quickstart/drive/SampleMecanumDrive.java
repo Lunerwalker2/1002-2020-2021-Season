@@ -32,6 +32,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.teamcode.Auto.hardware.Drive;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.LynxModuleUtil;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
@@ -83,7 +84,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private Drive drive;
 
+    private Robot robot;
+
     public SampleMecanumDrive(HardwareMap hardwareMap) {
+
         super(kV, kA, kStatic, TRACK_WIDTH);
 
         dashboard = FtcDashboard.getInstance();
@@ -106,7 +110,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         hubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule module : hubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
         drive = new Drive(hardwareMap);

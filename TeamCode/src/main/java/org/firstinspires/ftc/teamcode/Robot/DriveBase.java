@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.MotorProfile;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
@@ -13,33 +14,38 @@ import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
 public class DriveBase extends Component {
 
 
-
-
-
-
-    private ExpansionHubMotor left_front_drive;
-    private ExpansionHubMotor left_back_drive;
-    private ExpansionHubMotor right_front_drive;
-    private ExpansionHubMotor right_back_drive;
+    //These are public because reflection is weird. Just leave them
+    @MotorProfile(hardwareName = HardwareNames.Drive.LEFT_FRONT, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.FORWARD)
+     public ExpansionHubMotor left_front_drive;
+    @MotorProfile(hardwareName = HardwareNames.Drive.LEFT_BACK, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.FORWARD)
+     public ExpansionHubMotor left_back_drive;
+    @MotorProfile(hardwareName = HardwareNames.Drive.RIGHT_FRONT, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.REVERSE)
+     public ExpansionHubMotor right_front_drive;
+    @MotorProfile(hardwareName = HardwareNames.Drive.RIGHT_BACK, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.REVERSE)
+     public ExpansionHubMotor right_back_drive;
 
 
     private static double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
+    private void applyProfile(ExpansionHubMotor motor){
+        try {
+            MotorProfile profile = getClass().getField(motor.toString()).getAnnotation(MotorProfile.class);
+            motor = hardwareMap.get(ExpansionHubMotor.class, profile.hardwareName());
+            motor.setZeroPowerBehavior(profile.defaultZeroPowerBehavior());
+            motor.setDirection(profile.defaultDirection());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public DriveBase(Robot robot, boolean useEncoders){
         super(robot);
-        left_front_drive = hardwareMap.get(ExpansionHubMotor.class, HardwareNames.Drive.LEFT_FRONT);
-        left_back_drive = hardwareMap.get(ExpansionHubMotor.class, HardwareNames.Drive.LEFT_BACK);
-        right_front_drive = hardwareMap.get(ExpansionHubMotor.class, HardwareNames.Drive.RIGHT_FRONT);
-        right_back_drive = hardwareMap.get(ExpansionHubMotor.class, HardwareNames.Drive.RIGHT_BACK);
 
-        right_front_drive.setDirection(DcMotorSimple.Direction.REVERSE);
-        right_back_drive.setDirection(DcMotorSimple.Direction.REVERSE);
+        applyProfile(left_front_drive);
+        applyProfile(left_back_drive);
+        applyProfile(right_front_drive);
+        applyProfile(right_back_drive);
 
-        left_front_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        left_back_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right_front_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right_back_drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if(useEncoders){
             left_front_drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -56,25 +62,27 @@ public class DriveBase extends Component {
 
     public void update(){
 
-        double x = Robot.movement_x;
-        double y = Robot.movement_y;
-        double turn = Robot.movement_turn;
+        double x = DriveFields.movement_x;
+        double y = DriveFields.movement_y;
+        double turn = DriveFields.movement_turn;
 
         double[] inputs = {x, y, turn};
 
         double[] output = m_v_mult(matrix, inputs);
+        DriveFields.distributePowers(output);
 
-        setPower(output);
+        setPower();
     }
 
-    public void setPower(double[] powers){
-        left_front_drive.setPower(powers[0]);
-        left_back_drive.setPower(powers[1]);
-        right_front_drive.setPower(powers[2]);
-        right_back_drive.setPower(powers[3]);
+    public void setPower(){
+        left_front_drive.setPower(DriveFields.lf_power);
+        left_back_drive.setPower(DriveFields.lb_power);
+        right_front_drive.setPower(DriveFields.rf_power);
+        right_back_drive.setPower(DriveFields.rb_power);
     }
 
     public void stop(){
-        setPower(new double[] {0,0,0,0});
+        DriveFields.distributePowers(new double[] {0,0,0,0});
+        setPower();
     }
 }
