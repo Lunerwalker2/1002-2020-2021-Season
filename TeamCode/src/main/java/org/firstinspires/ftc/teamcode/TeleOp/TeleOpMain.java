@@ -36,7 +36,7 @@ public class TeleOpMain extends OpMode {
     @Override
     public void init() {
 
-        robot = new Robot(this, ALLIANCE.OTHER);
+        robot = new Robot(this, ALLIANCE.OTHER, false);
 
         new PlaySound(hardwareMap, R.raw.shutdown);
         mego = new PlaySound(hardwareMap, R.raw.megalovania);

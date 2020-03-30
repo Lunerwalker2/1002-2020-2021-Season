@@ -52,7 +52,7 @@ public class OdometryTest extends LinearOpMode {
 
         //Set up the robot
         Robot.userStartingPosition = startingPosition;
-        robot = new Robot(this, ALLIANCE.OTHER);
+        robot = new Robot(this, ALLIANCE.OTHER, false);
 
 
         waitForStart();

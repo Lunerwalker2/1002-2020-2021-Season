@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -23,11 +25,10 @@ public class LocalizationTest extends LinearOpMode {
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
+
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Robot robot = new Robot(this, ALLIANCE.OTHER, true);
 
         waitForStart();
 
@@ -53,15 +54,10 @@ public class LocalizationTest extends LinearOpMode {
                 vel = baseVel;
             }
 
-            drive.setDrivePower(vel);
+            robot.roadRunnerBase.setDrivePower(vel);
 
-            drive.update();
+            robot.update();
 
-            Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.update();
         }
     }
 }

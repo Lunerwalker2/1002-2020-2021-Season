@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.firstinspires.ftc.teamcode.Util.WheelPowerCanvas;
@@ -31,6 +32,9 @@ public class Robot {
     public Odometry odometry;
     public BulkData bulkData;
 
+    //Road Runner component
+    public SampleMecanumDrive roadRunnerBase;
+
     //Ftc dashboard
     private FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -46,7 +50,10 @@ public class Robot {
     //To be used mostly in teleop
     public static Pose2d userStartingPosition = new Pose2d(0,0, new Rotation2d(0));
 
-    public Robot(OpMode opMode, ALLIANCE alliance) {
+    private final boolean useRoadRunner;
+
+
+    public Robot(OpMode opMode, ALLIANCE alliance, boolean useRoadRunner) {
         this.opMode = opMode;
 
         //Initialize components
@@ -65,6 +72,13 @@ public class Robot {
             odometry = new Odometry(this,userStartingPosition);
         }
 
+        //If using RR, then set up the class
+        if(useRoadRunner) {
+            roadRunnerBase = new SampleMecanumDrive(this);
+        }
+        this.useRoadRunner = useRoadRunner;
+
+
         //Set dashboard update time
         dashboard.setTelemetryTransmissionInterval(25);
     }
@@ -74,7 +88,11 @@ public class Robot {
         //This should be called before other hardware calls
         bulkData.update();
 
-        driveBase.update();
+        if(!useRoadRunner) {
+            driveBase.update();
+        } else {
+            roadRunnerBase.update();
+        }
 
         odometry.update();
 
