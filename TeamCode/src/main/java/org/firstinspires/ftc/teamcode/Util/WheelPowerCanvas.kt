@@ -11,6 +11,7 @@ object WheelPowerCanvas {
     private var robotColor = "#0ceb2d"
     private var lineColor = "#0c6deb"
     private const val zeroThreshold = 0.5
+
     @JvmStatic
     fun drawRobotMovement(canvas: Canvas) {
         //Draw the robot

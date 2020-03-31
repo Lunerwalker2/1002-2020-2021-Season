@@ -50,10 +50,10 @@ public class Robot {
     //To be used mostly in teleop
     public static Pose2d userStartingPosition = new Pose2d(0,0, new Rotation2d(0));
 
-    private final boolean useRoadRunner;
+    public TelemetryPacket packet = new TelemetryPacket();
 
 
-    public Robot(OpMode opMode, ALLIANCE alliance, boolean useRoadRunner) {
+    public Robot(OpMode opMode, ALLIANCE alliance) {
         this.opMode = opMode;
 
         //Initialize components
@@ -72,11 +72,7 @@ public class Robot {
             odometry = new Odometry(this,userStartingPosition);
         }
 
-        //If using RR, then set up the class
-        if(useRoadRunner) {
-            roadRunnerBase = new SampleMecanumDrive(this);
-        }
-        this.useRoadRunner = useRoadRunner;
+        roadRunnerBase = new SampleMecanumDrive(this);
 
 
         //Set dashboard update time
@@ -88,11 +84,9 @@ public class Robot {
         //This should be called before other hardware calls
         bulkData.update();
 
-        if(!useRoadRunner) {
-            driveBase.update();
-        } else {
-            roadRunnerBase.update();
-        }
+        roadRunnerBase.update();
+        driveBase.updateHolonomic();
+
 
         odometry.update();
 
@@ -107,7 +101,7 @@ public class Robot {
 
     //Compiles telemetry to both dashboard and telemetry
     private void compileTelemetry(){
-        TelemetryPacket packet = new TelemetryPacket();
+        packet = new TelemetryPacket();
 
         packet.put("Robot X", Odometry.world_x_position);
         packet.put("Robot Y", Odometry.world_y_position);

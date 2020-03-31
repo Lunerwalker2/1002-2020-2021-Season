@@ -133,7 +133,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
                     "PID is not in use", getClass().getSimpleName());
         }
 
-        robot = new Robot(this, ALLIANCE.OTHER, true);
+        robot = new Robot(this, ALLIANCE.OTHER);
 
         addPidVariable();
 
@@ -150,7 +150,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
 
         while (!isStopRequested()) {
-            TelemetryPacket packet = new TelemetryPacket();
+            TelemetryPacket packet = robot.packet;
 
             // calculate and set the motor power
             double profileTime = clock.seconds() - profileStart;
@@ -168,13 +168,14 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
             List<Double> velocities = robot.roadRunnerBase.getWheelVelocities();
 
+            robot.update();
+
             // update telemetry
             packet.put("targetVelocity", motionState.getV());
             for (int i = 0; i < velocities.size(); i++) {
                 packet.put("velocity" + i, velocities.get(i));
                 packet.put("error" + i, motionState.getV() - velocities.get(i));
             }
-            dashboard.sendTelemetryPacket(packet);
         }
 
         removePidVariable();

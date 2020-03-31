@@ -20,7 +20,7 @@ public class StraightTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER, true);
+        Robot robot = new Robot(this, ALLIANCE.OTHER);
 
         Trajectory trajectory = robot.roadRunnerBase.trajectoryBuilder(new Pose2d())
                 .forward(DISTANCE)
@@ -30,6 +30,10 @@ public class StraightTest extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        robot.roadRunnerBase.followTrajectory(trajectory);
+        robot.roadRunnerBase.followTrajectoryAsync(trajectory);
+
+        while(opModeIsActive()){
+            robot.update();
+        }
     }
 }

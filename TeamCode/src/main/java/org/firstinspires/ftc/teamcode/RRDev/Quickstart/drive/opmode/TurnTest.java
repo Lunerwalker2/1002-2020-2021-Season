@@ -18,12 +18,16 @@ public class TurnTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER, true);
+        Robot robot = new Robot(this, ALLIANCE.OTHER);
 
         waitForStart();
 
         if (isStopRequested()) return;
 
-        robot.roadRunnerBase.turn(Math.toRadians(ANGLE));
+        robot.roadRunnerBase.turnAsync(Math.toRadians(ANGLE));
+
+        while(opModeIsActive()){
+            robot.update();
+        }
     }
 }

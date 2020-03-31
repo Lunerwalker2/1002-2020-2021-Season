@@ -52,34 +52,27 @@ public class OdometryTest extends LinearOpMode {
 
         //Set up the robot
         Robot.userStartingPosition = startingPosition;
-        robot = new Robot(this, ALLIANCE.OTHER, false);
+        robot = new Robot(this, ALLIANCE.OTHER);
 
 
         waitForStart();
 
 
         while (opModeIsActive()){
-            robot.update();
 
             double rawExternalHeadingRad = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
 
-            TelemetryPacket packet = new TelemetryPacket();
-            Canvas fieldOverlay = packet.fieldOverlay();
+            Canvas fieldOverlay = robot.packet.fieldOverlay();
 
-            packet.put("Robot X", Odometry.world_x_position);
-            packet.put("Robot Y", Odometry.world_y_position);
-            packet.put("Robot Heading (deg)", Odometry.world_angle_deg);
-            packet.put("Robot Heading (rad)", Odometry.world_angle_rad);
-
-            packet.put("Robot Heading IMU (deg)", addOffsetDeg(toDegrees(rawExternalHeadingRad), -90));
-            packet.put("Robot Heading IMU (rad)", addOffsetRad(rawExternalHeadingRad, -90));
+            robot.packet.put("Robot Heading IMU (deg)", addOffsetDeg(toDegrees(rawExternalHeadingRad), -90));
+            robot.packet.put("Robot Heading IMU (rad)", addOffsetRad(rawExternalHeadingRad, -90));
 
 
 
             fieldOverlay.setStroke("##18cf15");
             DashboardUtil.drawRobot(fieldOverlay, new com.acmerobotics.roadrunner.geometry.Pose2d(Odometry.world_x_position, Odometry.world_y_position, Odometry.world_angle_rad));
 
-            FtcDashboard.getInstance().sendTelemetryPacket(packet);
+            robot.update();
         }
 
 

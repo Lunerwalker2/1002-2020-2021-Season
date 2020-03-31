@@ -28,7 +28,7 @@ public class LocalizationTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER, true);
+        Robot robot = new Robot(this, ALLIANCE.OTHER);
 
         waitForStart();
 

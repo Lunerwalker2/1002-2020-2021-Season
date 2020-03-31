@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
@@ -15,9 +16,11 @@ import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
  */
 @Autonomous(group = "drive")
 public class SplineTest extends LinearOpMode {
+
+    ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER, true);
+        Robot robot = new Robot(this, ALLIANCE.OTHER);
 
         waitForStart();
 
@@ -27,14 +30,21 @@ public class SplineTest extends LinearOpMode {
                 .splineTo(new Pose2d(30, 30, 0))
                 .build();
 
-        robot.roadRunnerBase.followTrajectory(traj);
+        robot.roadRunnerBase.followTrajectoryAsync(traj);
 
-        sleep(2000);
+        timer.reset();
+        while(opModeIsActive() && timer.milliseconds() < 2000){
+            robot.update();
+        }
 
-        robot.roadRunnerBase.followTrajectory(
+        robot.roadRunnerBase.followTrajectoryAsync(
                 robot.roadRunnerBase.trajectoryBuilder(traj.end(), Angle.norm(traj.end().getHeading() + Math.PI))
                         .splineTo(new Pose2d(0, 0, 0))
                         .build()
         );
+
+        while (opModeIsActive()) {
+            robot.update();
+        }
     }
 }

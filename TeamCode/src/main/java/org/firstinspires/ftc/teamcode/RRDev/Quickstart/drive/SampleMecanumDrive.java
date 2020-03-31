@@ -33,6 +33,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Auto.hardware.Drive;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.LynxModuleUtil;
+import org.firstinspires.ftc.teamcode.Robot.DriveFields;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.openftc.revextensions2.ExpansionHubMotor;
@@ -65,7 +66,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         FOLLOW_TRAJECTORY
     }
 
-    private FtcDashboard dashboard;
     private NanoClock clock;
 
     private Mode mode;
@@ -89,8 +89,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH);
 
         this.robot = robot;
-        dashboard = FtcDashboard.getInstance();
-        dashboard.setTelemetryTransmissionInterval(25);
 
         clock = NanoClock.system();
 
@@ -186,7 +184,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         poseHistory.add(currentPose);
 
-        TelemetryPacket packet = new TelemetryPacket();
+        TelemetryPacket packet = robot.packet;
         Canvas fieldOverlay = packet.fieldOverlay();
 
         packet.put("mode", mode);
@@ -246,8 +244,6 @@ public class SampleMecanumDrive extends MecanumDrive {
                 break;
             }
         }
-
-        dashboard.sendTelemetryPacket(packet);
     }
 
     public void waitForIdle() {
@@ -295,7 +291,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        robot.driveBase.setPowerRR(new double[] {v, v1, v2, v3});
+        DriveFields.lf_power = v;
+        DriveFields.lb_power = v1;
+        DriveFields.rf_power = v3;
+        DriveFields.rb_power = v2;
     }
 
     private double addOffsetRad(double heading, double offset){

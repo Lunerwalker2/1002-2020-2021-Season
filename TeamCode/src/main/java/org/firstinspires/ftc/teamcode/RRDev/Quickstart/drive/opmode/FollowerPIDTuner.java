@@ -21,7 +21,7 @@ public class FollowerPIDTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER, true);
+        Robot robot = new Robot(this, ALLIANCE.OTHER);
 
         Pose2d startPose = new Pose2d(-DISTANCE / 2, -DISTANCE / 2, 0);
 
@@ -35,8 +35,14 @@ public class FollowerPIDTuner extends LinearOpMode {
             Trajectory traj = robot.roadRunnerBase.trajectoryBuilder(startPose)
                     .forward(DISTANCE)
                     .build();
-            robot.roadRunnerBase.followTrajectory(traj);
-            robot.roadRunnerBase.turn(Math.toRadians(90));
+            while(opModeIsActive() && robot.roadRunnerBase.isBusy()) {
+                robot.roadRunnerBase.followTrajectoryAsync(traj);
+                robot.update();
+            }
+            while(opModeIsActive() && robot.roadRunnerBase.isBusy()) {
+                robot.roadRunnerBase.turn(Math.toRadians(90));
+                robot.update();
+            }
 
             startPose = traj.end().plus(new Pose2d(0, 0, Math.toRadians(90)));
         }

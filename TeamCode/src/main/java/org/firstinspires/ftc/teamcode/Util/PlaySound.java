@@ -32,6 +32,9 @@ public class PlaySound {
         }
     }
 
+    /**
+     * Stop and release all the resources taken up by the media player
+     */
     public void stop(){
         try {
             mp.stop();

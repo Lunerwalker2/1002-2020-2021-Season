@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
-import org.firstinspires.ftc.teamcode.Util.DriveMotor;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.firstinspires.ftc.teamcode.Util.MotorProfile;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,42 +37,41 @@ public class DriveBase extends Component {
 
     private static double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
 
-    private void applyProfile(ExpansionHubMotor motor){
-        try {
-            MotorProfile profile = getClass().getField(motor.toString()).getAnnotation(MotorProfile.class);
-            motor = hardwareMap.get(ExpansionHubMotor.class, profile.hardwareName());
-            motor.setZeroPowerBehavior(profile.defaultZeroPowerBehavior());
-            motor.setDirection(profile.defaultDirection());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
     public DriveBase(Robot robot, boolean useEncoders){
         super(robot);
 
         motors = (ArrayList<ExpansionHubMotor>) Arrays.asList(left_front_drive, left_back_drive, right_front_drive, right_back_drive);
 
-        applyProfile(left_front_drive);
-        applyProfile(left_back_drive);
-        applyProfile(right_front_drive);
-        applyProfile(right_back_drive);
+        left_front_drive = findMotor(HardwareNames.Drive.LEFT_FRONT);
+        left_back_drive = findMotor(HardwareNames.Drive.LEFT_BACK);
+        right_front_drive = findMotor(HardwareNames.Drive.RIGHT_FRONT);
+        right_back_drive = findMotor(HardwareNames.Drive.RIGHT_BACK);
+
+        motors.forEach((motor) -> motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE));
+        right_front_drive.setDirection(DcMotorSimple.Direction.REVERSE);
+        right_back_drive.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
 
         if(useEncoders){
-            left_front_drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            left_back_drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            right_front_drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            right_back_drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motors.forEach((motor) -> motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER));
         } else {
-            left_front_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            left_back_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            right_front_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            right_back_drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motors.forEach((motor) -> motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER));
         }
     }
 
-    public void update(){
+    private ExpansionHubMotor findMotor(String name){
+        return hardwareMap.get(ExpansionHubMotor.class, name);
+    }
+
+    /**
+     * Update the drive base using the
+     * {@link DriveFields#movement_x}, {@link DriveFields#movement_y}, and
+     * {@link DriveFields#movement_turn}. This uses those components and turns them into
+     * drive powers with the order of {@code {lf, lb, rf, rb}}. Then it updates the drive motors.
+     */
+    public void updateHolonomic(){
 
         double x = DriveFields.movement_x;
         double y = DriveFields.movement_y;
@@ -86,6 +85,17 @@ public class DriveBase extends Component {
         setPower();
     }
 
+    /**
+     * Simply updates motor powers with stored powers
+     */
+    public void updatePowers(){
+        setPower();
+    }
+
+    /**
+     * Returns the positions of each motor
+     * @return An array with the motor positions
+     */
     public double[] getPositions(){
         return new double[] {
                 left_front_drive.getCurrentPosition(),
@@ -95,6 +105,11 @@ public class DriveBase extends Component {
         };
     }
 
+    /**
+     * Set PIDF coefficients to all drive motors
+     * @param coefficients The PIDF coefficients
+     * @param runMode The mode to set them as (usually RUN_USING_ENCODER)
+     */
     public void setPIDCoefficients(PIDFCoefficients coefficients, DcMotor.RunMode runMode){
         motors.forEach((motor) -> motor.setPIDFCoefficients(runMode, coefficients));
     }
@@ -144,13 +159,5 @@ public class DriveBase extends Component {
                 right_front_drive.getVelocity(),
                 right_back_drive.getVelocity()
         );
-    }
-
-    public void setPowerRR(double[] powers){
-        DriveFields.lf_power = powers[0];
-        DriveFields.lb_power = powers[1];
-        DriveFields.rb_power = powers[2];
-        DriveFields.rf_power = powers[3];
-        setPower();
     }
 }

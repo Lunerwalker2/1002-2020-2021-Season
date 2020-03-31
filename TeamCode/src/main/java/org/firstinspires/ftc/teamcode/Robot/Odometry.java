@@ -14,15 +14,6 @@ import org.openftc.revextensions2.ExpansionHubMotor;
 public class Odometry extends Component {
 
 
-    public Odometry(Robot robot){
-        super(robot);
-    }
-
-    public enum HeadingMode {
-        HEADING_FROM_IMU,
-        HEADING_FROM_ENCODERS
-    }
-
 
     public static double world_x_position;
     public static double world_y_position;

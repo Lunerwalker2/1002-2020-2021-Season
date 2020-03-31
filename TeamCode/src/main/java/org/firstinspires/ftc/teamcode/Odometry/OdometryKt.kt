@@ -6,7 +6,6 @@ import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer
 import org.firstinspires.ftc.robotcore.external.Func
 
 
-
 class OdometryKt(val getLeftPosition: Func<Int>, val getRightPosition: Func<Int>, val getCenterPosition: Func<Int>):
         ThreeTrackingWheelLocalizer(listOf(
         Pose2d(0.0, design.TRACK_WIDTH / 2, 0.0),  // left
