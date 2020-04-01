@@ -94,7 +94,7 @@ public class DashboardCam extends LinearOpMode {
         /*
          * Start the dashboard stream using frames from this camera
          */
-        dashboard.startCameraStream((OpenCvCameraBase) phoneCam, 30);
+        dashboard.startCameraStream((CameraStreamSource) phoneCam, 30);
 
         while (opModeIsActive())
         {
