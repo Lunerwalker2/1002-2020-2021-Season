@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Util;
 
-public enum ALLIANCE {
+public enum Alliance {
 
     BLUE,
     RED,

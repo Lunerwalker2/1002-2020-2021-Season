@@ -11,9 +11,8 @@ import com.qualcomm.robotcore.util.MovingStatistics;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 
 /*
  * This routine determines the effective track width. The procedure works by executing a point turn
@@ -35,7 +34,7 @@ public class TrackWidthTuner extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Robot robot = new Robot(this, ALLIANCE.OTHER);
+        Robot robot = new Robot(this, Alliance.OTHER);
         // TODO: if you haven't already, set the localizer to something that doesn't depend on
         // drive encoders for computing the heading
 

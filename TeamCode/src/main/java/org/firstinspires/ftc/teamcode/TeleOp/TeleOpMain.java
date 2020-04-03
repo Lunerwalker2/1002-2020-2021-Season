@@ -1,24 +1,13 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.Auto.Placeholder;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Robot.DriveFields;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
-import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
-import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
-import org.openftc.revextensions2.ExpansionHubMotor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @TeleOp(name="Main TeleOp")
 public class TeleOpMain extends OpMode {
@@ -36,7 +25,7 @@ public class TeleOpMain extends OpMode {
     @Override
     public void init() {
 
-        robot = new Robot(this, ALLIANCE.OTHER);
+        robot = new Robot(this, Alliance.OTHER);
 
         new PlaySound(hardwareMap, R.raw.shutdown);
         mego = new PlaySound(hardwareMap, R.raw.megalovania);

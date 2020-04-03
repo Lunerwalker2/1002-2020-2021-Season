@@ -5,14 +5,11 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
-import org.firstinspires.ftc.teamcode.Util.HardwareNames;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 import org.firstinspires.ftc.teamcode.Util.WheelPowerCanvas;
 
 import static org.firstinspires.ftc.teamcode.Robot.DriveFields.movement_turn;
@@ -52,24 +49,24 @@ public class Robot {
 
     public TelemetryPacket packet = new TelemetryPacket();
 
-    public ALLIANCE alliance;
+    public Alliance alliance;
 
 
-    public Robot(OpMode opMode, ALLIANCE alliance) {
+    public Robot(OpMode opMode, Alliance alliance) {
         this.opMode = opMode;
         this.alliance = alliance;
 
         //Initialize components
 
         //Use encoders if in auto
-        driveBase = new DriveBase(this, alliance != ALLIANCE.OTHER);
+        driveBase = new DriveBase(this, alliance != Alliance.OTHER);
 
         bulkData = new BulkData(this);
 
         //Decide how to initialize odometry
-        if (alliance == ALLIANCE.RED) {
+        if (alliance == Alliance.RED) {
             odometry = new Odometry(this, redStartingPosition);
-        } else if(alliance == ALLIANCE.BLUE) {
+        } else if(alliance == Alliance.BLUE) {
             odometry = new Odometry(this, blueStartingPosition);
         } else {
             odometry = new Odometry(this,userStartingPosition);
@@ -87,7 +84,7 @@ public class Robot {
         //This should be called before other hardware calls
         bulkData.update();
 
-        if(alliance == ALLIANCE.OTHER)driveBase.updateHolonomic();
+        if(alliance == Alliance.OTHER)driveBase.updateHolonomic();
         else driveBase.updatePowers();
 
 

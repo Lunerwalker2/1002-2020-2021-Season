@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.config.ValueProvider;
 import com.acmerobotics.dashboard.config.variable.BasicVariable;
 import com.acmerobotics.dashboard.config.variable.CustomVariable;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -19,9 +18,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 
 import java.util.List;
 
@@ -133,7 +131,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
                     "PID is not in use", getClass().getSimpleName());
         }
 
-        robot = new Robot(this, ALLIANCE.OTHER);
+        robot = new Robot(this, Alliance.OTHER);
 
         addPidVariable();
 

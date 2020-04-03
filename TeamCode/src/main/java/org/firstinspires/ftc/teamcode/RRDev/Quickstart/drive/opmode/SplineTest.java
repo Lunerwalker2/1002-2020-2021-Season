@@ -7,9 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 
 /*
  * This is an example of a more complex path to really test the tuning.
@@ -20,7 +19,7 @@ public class SplineTest extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER);
+        Robot robot = new Robot(this, Alliance.OTHER);
 
         waitForStart();
 

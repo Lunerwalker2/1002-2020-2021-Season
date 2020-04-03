@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Robot.DriveFields;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
@@ -42,7 +42,7 @@ public class TeleOpReverseStacking extends OpMode {
     @Override
     public void init(){
 
-        robot = new Robot(this, ALLIANCE.OTHER);
+        robot = new Robot(this, Alliance.OTHER);
 
         new PlaySound(hardwareMap, R.raw.shutdown).play();
         mego = new PlaySound(hardwareMap, R.raw.megalovania);

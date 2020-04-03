@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -28,7 +25,7 @@ public class LocalizationTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, ALLIANCE.OTHER);
+        Robot robot = new Robot(this, Alliance.OTHER);
 
         waitForStart();
 

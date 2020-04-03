@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -14,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.Robot.Odometry;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 
 import static java.lang.Math.addExact;
@@ -52,7 +51,7 @@ public class OdometryTest extends LinearOpMode {
 
         //Set up the robot
         Robot.userStartingPosition = startingPosition;
-        robot = new Robot(this, ALLIANCE.OTHER);
+        robot = new Robot(this, Alliance.OTHER);
 
 
         waitForStart();
