@@ -168,6 +168,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
             List<Double> velocities = robot.roadRunnerBase.getWheelVelocities();
 
+            robot.roadRunnerBase.update();
             robot.update();
 
             // update telemetry

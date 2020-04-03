@@ -27,7 +27,8 @@ public class TurnTest extends LinearOpMode {
         robot.roadRunnerBase.turnAsync(Math.toRadians(ANGLE));
 
         while(opModeIsActive()){
-            robot.update();
+            robot.roadRunnerBase.update();
+            robot.update();;
         }
     }
 }

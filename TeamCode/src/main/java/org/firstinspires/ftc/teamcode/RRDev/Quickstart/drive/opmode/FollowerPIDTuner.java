@@ -37,10 +37,12 @@ public class FollowerPIDTuner extends LinearOpMode {
                     .build();
             while(opModeIsActive() && robot.roadRunnerBase.isBusy()) {
                 robot.roadRunnerBase.followTrajectoryAsync(traj);
+                robot.roadRunnerBase.update();
                 robot.update();
             }
             while(opModeIsActive() && robot.roadRunnerBase.isBusy()) {
                 robot.roadRunnerBase.turn(Math.toRadians(90));
+                robot.roadRunnerBase.update();
                 robot.update();
             }
 

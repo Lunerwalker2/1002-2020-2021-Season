@@ -52,9 +52,12 @@ public class Robot {
 
     public TelemetryPacket packet = new TelemetryPacket();
 
+    public ALLIANCE alliance;
+
 
     public Robot(OpMode opMode, ALLIANCE alliance) {
         this.opMode = opMode;
+        this.alliance = alliance;
 
         //Initialize components
 
@@ -84,8 +87,8 @@ public class Robot {
         //This should be called before other hardware calls
         bulkData.update();
 
-        roadRunnerBase.update();
-        driveBase.updateHolonomic();
+        if(alliance == ALLIANCE.OTHER)driveBase.updateHolonomic();
+        else driveBase.updatePowers();
 
 
         odometry.update();

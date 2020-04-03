@@ -34,6 +34,7 @@ public class SplineTest extends LinearOpMode {
 
         timer.reset();
         while(opModeIsActive() && timer.milliseconds() < 2000){
+            robot.roadRunnerBase.update();
             robot.update();
         }
 
@@ -44,6 +45,7 @@ public class SplineTest extends LinearOpMode {
         );
 
         while (opModeIsActive()) {
+            robot.roadRunnerBase.update();
             robot.update();
         }
     }

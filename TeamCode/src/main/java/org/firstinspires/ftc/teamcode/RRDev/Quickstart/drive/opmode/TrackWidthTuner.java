@@ -66,6 +66,7 @@ public class TrackWidthTuner extends LinearOpMode {
                 headingAccumulator += Angle.norm(heading - lastHeading);
                 lastHeading = heading;
 
+                robot.roadRunnerBase.update();
                 robot.update();
             }
 

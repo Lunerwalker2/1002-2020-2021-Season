@@ -33,6 +33,7 @@ public class StraightTest extends LinearOpMode {
         robot.roadRunnerBase.followTrajectoryAsync(trajectory);
 
         while(opModeIsActive()){
+            robot.roadRunnerBase.update();
             robot.update();
         }
     }

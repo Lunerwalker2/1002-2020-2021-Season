@@ -56,6 +56,7 @@ public class LocalizationTest extends LinearOpMode {
 
             robot.roadRunnerBase.setDrivePower(vel);
 
+            robot.roadRunnerBase.update();
             robot.update();
 
         }
