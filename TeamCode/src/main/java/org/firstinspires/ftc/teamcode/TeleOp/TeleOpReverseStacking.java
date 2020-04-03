@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,16 +9,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.AssetsTrajectoryManager;
-import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
-import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
-import org.firstinspires.ftc.teamcode.Util.HardwareNames;
-import org.firstinspires.ftc.teamcode.Util.MathThings;
+import org.firstinspires.ftc.teamcode.Robot.DriveFields;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
 import org.openftc.revextensions2.ExpansionHubMotor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TeleOpReverseStacking extends OpMode {
 
@@ -29,18 +23,13 @@ public class TeleOpReverseStacking extends OpMode {
 
     //Drive motors are going to stay here (this could be changed, but I want to keep track of them)
 
-    private ExpansionHubMotor left_front_drive, left_back_drive, right_front_drive, right_back_drive;
+    private Robot robot;
 
     //Reverse stacking things
     private Intake intake;
     private Outake outake;
     private Grabber grabber;
 
-
-
-    private final double[][] matrix = {DriveBaseVectors.forward, DriveBaseVectors.strafeR, DriveBaseVectors.turnCW};
-
-    private ArrayList<TeleOpSystem> systems = new ArrayList<>();
 
     //MAKE SURE THESE GO LAST!!
 
@@ -49,10 +38,11 @@ public class TeleOpReverseStacking extends OpMode {
     private boolean soundChanged = false;
     private PlaySound mego;
 
-    private Drive drive = new Drive(this, () -> gamepad1.left_bumper, matrix, () -> 0.6);
 
     @Override
     public void init(){
+
+        robot = new Robot(this, ALLIANCE.OTHER);
 
         new PlaySound(hardwareMap, R.raw.shutdown).play();
         mego = new PlaySound(hardwareMap, R.raw.megalovania);
@@ -61,34 +51,7 @@ public class TeleOpReverseStacking extends OpMode {
         outake = new Outake(hardwareMap);
         grabber = new Grabber(hardwareMap);
 
-        //Add all systems to the list for easy access
-        systems.add(drive);
 
-        //Init Hardware
-
-        setBulkModeManual();
-
-        for(TeleOpSystem system : systems){
-            system.initHardware();
-        }
-
-        //Drive Motors stay here
-        left_front_drive = findMotor(HardwareNames.Drive.LEFT_FRONT);
-        left_back_drive = findMotor(HardwareNames.Drive.LEFT_BACK);
-        right_front_drive = findMotor(HardwareNames.Drive.RIGHT_FRONT);
-        right_back_drive = findMotor(HardwareNames.Drive.RIGHT_BACK);
-
-        //Reverse right side
-        right_front_drive.setDirection(DcMotorSimple.Direction.REVERSE);
-        right_back_drive.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        //Set to encoder movement
-        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        //Set to BRAKE
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        stopDrive();
     }
 
     @Override
@@ -98,18 +61,11 @@ public class TeleOpReverseStacking extends OpMode {
 
     @Override
     public void start(){
-        for(TeleOpSystem system : systems){
-            system.onStart();
-        }
     }
 
     @Override
     public void loop(){
         clearBulkCache();
-        //Update all the systems
-        for(TeleOpSystem system : systems){
-            system.update();
-        }
 
         //INTAKE
         if(gamepad2.left_trigger > 0.2){
@@ -152,12 +108,12 @@ public class TeleOpReverseStacking extends OpMode {
         }
 
         //DRIVE
-        double[] output = drive.drive(new double[]{gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x});
+        DriveFields.movement_x = gamepad1.left_stick_x;
+        DriveFields.movement_y = -gamepad1.left_stick_y;
+        DriveFields.movement_turn = gamepad1.right_stick_x;
 
-        left_front_drive.setPower(output[0]);
-        left_back_drive.setPower(output[1]);
-        right_front_drive.setPower(output[2]);
-        right_back_drive.setPower(output[3]);
+
+        robot.update();
 
         //OTHER
         controlSound();
@@ -165,12 +121,7 @@ public class TeleOpReverseStacking extends OpMode {
 
     @Override
     public void stop(){
-        //Stop all systems
-        for(TeleOpSystem system : systems){
-            system.stop();
-        }
-        //Stop drive base
-        stopDrive();
+
     }
 
     private void controlSound(){
@@ -308,11 +259,6 @@ public class TeleOpReverseStacking extends OpMode {
             grabber.setPosition(OPEN_POSITION);
         }
     }
-
-
-    private ExpansionHubMotor findMotor(String id){
-        return hardwareMap.get(ExpansionHubMotor.class, id);
-    }
     
     private CRServo findCRServo(String id){
       return hardwareMap.get(CRServo.class, id);
@@ -322,26 +268,6 @@ public class TeleOpReverseStacking extends OpMode {
       return hardwareMap.get(Servo.class, id);
     }
 
-    private void setMode(DcMotor.RunMode runMode){
-        left_front_drive.setMode(runMode);
-        left_back_drive.setMode(runMode);
-        right_front_drive.setMode(runMode);
-        right_back_drive.setMode(runMode);
-    }
-
-    private void setZeroPowerBehavior(ExpansionHubMotor.ZeroPowerBehavior behavior){
-        left_front_drive.setZeroPowerBehavior(behavior);
-        left_back_drive.setZeroPowerBehavior(behavior);
-        right_front_drive.setZeroPowerBehavior(behavior);
-        right_back_drive.setZeroPowerBehavior(behavior);
-    }
-
-    private void stopDrive(){
-        left_front_drive.setPower(0);
-        left_back_drive.setPower(0);
-        right_front_drive.setPower(0);
-        right_back_drive.setPower(0);
-    }
 
     private void setBulkModeManual(){
         for(LynxModule module : hardwareMap.getAll(LynxModule.class)){

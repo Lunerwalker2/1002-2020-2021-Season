@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Auto.Placeholder;
 import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.Robot.DriveFields;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.TeleOp.TeleOpSystems.*;
 import org.firstinspires.ftc.teamcode.Util.ALLIANCE;
 import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
@@ -59,6 +59,9 @@ public class TeleOpMain extends OpMode {
 
         checkSound();
 
+        DriveFields.movement_x = gamepad1.left_stick_x;
+        DriveFields.movement_y = -gamepad1.left_stick_y;
+        DriveFields.movement_turn = gamepad1.right_stick_x;
         robot.update();
     }
 
