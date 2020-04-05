@@ -30,7 +30,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Auto.hardware.Drive;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.Robot.DriveFields;
@@ -74,7 +73,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private MotionProfile turnProfile;
     private double turnStart;
 
-    private DriveConstraints constraints;
+    public DriveConstraints constraints;
     private TrajectoryFollower follower;
 
     private List<Pose2d> poseHistory;

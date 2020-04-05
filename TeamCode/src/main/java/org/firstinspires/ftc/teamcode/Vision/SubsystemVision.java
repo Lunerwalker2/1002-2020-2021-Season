@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Vision.pipeline.Init3BlockDetection;
@@ -10,54 +9,46 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class SubsystemVision {
 
     public Init3BlockDetection pipeline;
 
     private LinearOpMode opMode;
-    private HardwareMap hardwareMap;
     private OpenCvCamera camera;
 
-    public SubsystemVision(HardwareMap hardwareMap, LinearOpMode opMode) {
-        this.hardwareMap = hardwareMap;
-
+    public SubsystemVision(LinearOpMode opMode) {
         this.opMode = opMode;
-
     }
 
     /**
      * Initiates all the necessary hardware.
      */
-    public void initHardware(){
+    public void init(){
 
         pipeline = new NaiveRectangleSamplingSkystoneDetectionPipeline();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources()
+        int cameraMonitorViewId = opMode.hardwareMap.appContext.getResources()
                 .getIdentifier(
                         "cameraMonitorViewId",
                         "id",
-                        hardwareMap.appContext.getPackageName()
+                        opMode.hardwareMap.appContext.getPackageName()
                 );
 
         camera = OpenCvCameraFactory
                 .getInstance()
-                .createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+                .createWebcam(opMode.hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         camera.openCameraDevice();
         camera.setPipeline(pipeline);
 
     }
 
-    /**Starts the stream. Must be called after {@link SubsystemVision#initHardware()}.
+    /**Starts the stream. Must be called after {@link SubsystemVision#init()}.
      *
      */
     public void startVision(){
-        camera.startStreaming(pipeline.getWidth(), pipeline.getHeight(), OpenCvCameraRotation.UPRIGHT);
-    }
-
-    @Deprecated
-    public void onInit() {
-        initHardware();
         camera.startStreaming(pipeline.getWidth(), pipeline.getHeight(), OpenCvCameraRotation.UPRIGHT);
     }
 
@@ -80,6 +71,22 @@ public class SubsystemVision {
 
         opMode.telemetry.update();
         opMode.sleep(10);
+    }
+
+    public Map<String, Object> getStreamData() {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("Skystone", pipeline.getDetectedSkystonePosition());
+        data.put("Skystone Positions",
+                pipeline.getSkystonePositions(3)[0] + "" + pipeline.getSkystonePositions(3)[1]);
+        data.put("Frame Count", camera.getFrameCount());
+        data.put("FPS", String.format(Locale.US,"%.2f", camera.getFps()));
+        data.put("Total frame time ms", camera.getTotalFrameTimeMs());
+        data.put("Pipeline time ms", camera.getPipelineTimeMs());
+        data.put("Overhead time ms", camera.getOverheadTimeMs());
+        data.put("Theoretical max FPS", camera.getCurrentPipelineMaxFps());
+
+        return data;
     }
 
 

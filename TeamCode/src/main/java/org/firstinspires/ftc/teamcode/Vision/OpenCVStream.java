@@ -18,10 +18,10 @@ public class OpenCVStream extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        SubsystemVision vision = new SubsystemVision(hardwareMap, this);
+        SubsystemVision vision = new SubsystemVision(this);
 
 
-        vision.initHardware();
+        vision.init();
 
         waitForStart();
 
@@ -33,7 +33,6 @@ public class OpenCVStream extends LinearOpMode {
         vision.streamLoop();
         while(opModeIsActive()){
             telemetry.update();
-
         }
 
         vision.stopVision();
