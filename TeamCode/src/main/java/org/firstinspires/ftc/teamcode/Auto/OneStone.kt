@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Auto
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import org.firstinspires.ftc.teamcode.Auto.base.RRAutoBase
 import org.firstinspires.ftc.teamcode.Robot.Robot
 import org.firstinspires.ftc.teamcode.Util.Alliance
@@ -25,7 +26,16 @@ Red side full trajectory to stone 3:
                                         .lineToLinearHeading(new Vector2d(0, -36), 0)
  */
 
-class OneStone(alliance: Alliance): RRAutoBase(alliance) {
+@Autonomous(name = "One Stone Red", group = "Autonomous")
+class OneStoneRed : OneStone(Alliance.RED)
+
+@Autonomous
+class OneStoneBlue : OneStone(Alliance.BLUE)
+
+
+
+
+abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
 
 
     val vision = SubsystemVision(this)
@@ -92,20 +102,20 @@ class OneStone(alliance: Alliance): RRAutoBase(alliance) {
         waitAndUpdate()
         followAsync(
                 trajectoryBuilderReversed(poseEstimate)
-                        .lineToLinearHeading(Vector2d(18.0, -36.0), toRadians(0.0))
+                        .lineToLinearHeading(changeSide(Vector2d(18.0, -36.0)), toRadians(0.0))
                         .build()
         )
         waitAndUpdate()
         followAsync(
                 trajectoryBuilder(poseEstimate)
-                        .splineToLinearHeading( Pose2d(36.0, -38.0, toRadians(55.0)), toRadians(55.0))
+                        .splineToLinearHeading(changeSide(Pose2d(36.0, -38.0, toRadians(55.0))), changeSide(toRadians(55.0)))
                         .build()
         )
         //Go to foundation
         waitAndUpdate()
         followAsync(
                 trajectoryBuilder(poseEstimate)
-                        .lineToLinearHeading( Vector2d(40.0, -33.0), toRadians(90.0))
+                        .lineToLinearHeading(changeSide(Vector2d(40.0, -33.0)), changeSide(toRadians(90.0)))
                         .build()
         )
         //Park
@@ -118,7 +128,7 @@ class OneStone(alliance: Alliance): RRAutoBase(alliance) {
         waitAndUpdate()
         followAsync(
                 trajectoryBuilder(poseEstimate)
-                        .lineToLinearHeading( Vector2d(0.0, -36.0), 0.0)
+                        .lineToLinearHeading(changeSide(Vector2d(0.0, -36.0)), 0.0)
                         .build()
         )
         waitAndUpdate()
