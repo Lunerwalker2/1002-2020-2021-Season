@@ -132,5 +132,8 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
                         .build()
         )
         waitAndUpdate()
+      
+      //Normally called on stop(), but here, stop() is whatever we want baby
+      robot.stop()
     }
 }
