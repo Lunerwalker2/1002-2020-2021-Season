@@ -83,13 +83,21 @@ public class Robot {
     public void update(){
         //This should be called before other hardware calls
         bulkData.update();
+        
+        //Updates odometry
+        odometry.update();
+         
+        
+        //Updates RoadRunner. If it isn't used, this does nothing
+        roadRunnerBase.update();
 
+        //If in teleOp, update using x, y, turn components
         if(alliance == Alliance.OTHER)driveBase.updateHolonomic();
+        //Otherwise, assume the powers were changed already and send them through
         else driveBase.updatePowers();
 
 
-        odometry.update();
-
+        //Compile some telemetry (to dashboard as of now) for the bois
         compileTelemetry();
         timer.reset();
     }
