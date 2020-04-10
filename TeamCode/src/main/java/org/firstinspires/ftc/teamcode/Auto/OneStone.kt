@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.Auto
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.Auto.base.RRAutoBase
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.opmode.SplineTest
 import org.firstinspires.ftc.teamcode.Robot.Robot
 import org.firstinspires.ftc.teamcode.Util.Alliance
 import org.firstinspires.ftc.teamcode.Vision.SubsystemVision
@@ -84,7 +86,7 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
                 waitAndUpdate()
                 followAsync(
                         trajectoryBuilder(poseEstimate)
-                                .lineTo(changeSide( Vector2d(-28.0, -36.0)))
+                                .lineTo(changeSide(Vector2d(-28.0, -36.0)))
                                 .build()
                 )
                 waitAndUpdate()
@@ -98,11 +100,11 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
         }
 
         //Go under bridge
-        turnAsync(changeSide(toRadians(20.0)))//REVERSED
+        turnAsync(changeSide(toRadians(20.0)))
         waitAndUpdate()
         followAsync(
                 trajectoryBuilderReversed(poseEstimate)
-                        .lineToLinearHeading(changeSide(Vector2d(18.0, -36.0)), toRadians(0.0))
+                        .lineToLinearHeading(changeSide(Vector2d(18.0, -36.0)), changeSide(toRadians(0.0)))
                         .build()
         )
         waitAndUpdate()
@@ -128,7 +130,7 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
         waitAndUpdate()
         followAsync(
                 trajectoryBuilder(poseEstimate)
-                        .lineToLinearHeading(changeSide(Vector2d(0.0, -36.0)), 0.0)
+                        .lineToLinearHeading(changeSide(Vector2d(0.0, -36.0)), changeSide(toRadians(0.0)))
                         .build()
         )
         waitAndUpdate()
