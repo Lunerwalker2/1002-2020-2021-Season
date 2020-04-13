@@ -31,7 +31,7 @@ Red side full trajectory to stone 3:
 @Autonomous(name = "One Stone Red", group = "Autonomous")
 class OneStoneRed : OneStone(Alliance.RED)
 
-@Autonomous
+@Autonomous(name = "One Stone Blue", group = "Autonomous")
 class OneStoneBlue : OneStone(Alliance.BLUE)
 
 

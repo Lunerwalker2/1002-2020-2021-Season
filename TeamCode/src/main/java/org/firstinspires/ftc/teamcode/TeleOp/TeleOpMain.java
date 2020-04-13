@@ -7,29 +7,37 @@ import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.Robot.DriveFields;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Util.Alliance;
+import org.firstinspires.ftc.teamcode.Util.Debouncer;
 import org.firstinspires.ftc.teamcode.Util.PlaySound;
 
-@TeleOp(name="Main TeleOp")
+import kotlin.Unit;
+
+@TeleOp(name="Main", group = "TeleOp")
 public class TeleOpMain extends OpMode {
 
 
+    private Debouncer soundControl;
 
-    private boolean bounce1 = false;
-    private boolean soundChanged = false;
     private PlaySound mego;
 
-
     private Robot robot;
-
 
     @Override
     public void init() {
 
         robot = new Robot(this, Alliance.OTHER);
 
-        new PlaySound(hardwareMap, R.raw.shutdown);
         mego = new PlaySound(hardwareMap, R.raw.megalovania);
 
+        soundControl = new Debouncer(() -> gamepad1.x);
+        soundControl.setOneAction(() -> {
+            mego.play();
+            return Unit.INSTANCE;
+        });
+        soundControl.setTwoAction(() -> {
+            mego.pause();
+            return Unit.INSTANCE;
+        });
 
     }
 
@@ -46,11 +54,12 @@ public class TeleOpMain extends OpMode {
     @Override
     public void loop(){
 
-        checkSound();
+        soundControl.check();
 
         DriveFields.movement_x = gamepad1.left_stick_x;
         DriveFields.movement_y = -gamepad1.left_stick_y;
         DriveFields.movement_turn = gamepad1.right_stick_x;
+
         robot.update();
     }
 
@@ -58,25 +67,5 @@ public class TeleOpMain extends OpMode {
     public void stop(){
 
         robot.stop();
-    }
-
-    private void controlSound(){
-        if(!soundChanged){
-            mego.pause();
-            soundChanged = true;
-        } else if(soundChanged){
-            mego.play();
-            soundChanged = false;
-        }
-    }
-
-    private void checkSound(){
-        if(gamepad1.x&&!bounce1){
-            controlSound();
-            bounce1=true;
-        }
-        else if(!gamepad1.x){
-            bounce1=false;
-        }
     }
 }

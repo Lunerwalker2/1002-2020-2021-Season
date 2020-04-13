@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -31,7 +32,7 @@ import java.util.Locale;
 @TeleOp(name="Easy OpenCv Dashboard Stream")
 public class DashboardCam extends LinearOpMode {
 
-    private OpenCvInternalCamera phoneCam;
+    private OpenCvCamera webcam;
 
     /*
      * Acquire the FtcDashboard instance
@@ -49,23 +50,26 @@ public class DashboardCam extends LinearOpMode {
 
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
 
 
-        phoneCam.setPipeline(new SamplePipeline());
+        webcam.setPipeline(new SamplePipeline());
 
 
 
-        cameraHardwareHandlerThread = new HandlerThread("CameraHardwareHandlerThread");
-        cameraHardwareHandlerThread.start();
-        cameraHardwareHandler = new Handler(cameraHardwareHandlerThread.getLooper());
+//        cameraHardwareHandlerThread = new HandlerThread("CameraHardwareHandlerThread");
+//        cameraHardwareHandlerThread.start();
+//        cameraHardwareHandler = new Handler(cameraHardwareHandlerThread.getLooper());
 
-        cameraHardwareHandler.post(() -> {
-            phoneCam.openCameraDevice();
-            phoneCam.setHardwareFrameTimingRange(new OpenCvInternalCamera.FrameTimingRange(30, 30));
-            phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-        });
+//        cameraHardwareHandler.post(() -> {
+//            webcam.openCameraDevice();
+//            webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+//        });
+
+        webcam.openCameraDevice();
+
+        webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
 
 
@@ -94,7 +98,7 @@ public class DashboardCam extends LinearOpMode {
         /*
          * Start the dashboard stream using frames from this camera
          */
-        dashboard.startCameraStream((CameraStreamSource) phoneCam, 30);
+        dashboard.startCameraStream((CameraStreamSource) webcam, 30);
 
         while (opModeIsActive())
         {
@@ -105,12 +109,12 @@ public class DashboardCam extends LinearOpMode {
              * Make use of dashboard's telemetry packets, which can allow the graphing of data.
              * In reality, it doesn't matter what you use, but this is nice
              */
-            packet.put("Frame Count", phoneCam.getFrameCount());
-            packet.put("FPS", String.format(Locale.US, "%.2f", phoneCam.getFps()));
-            packet.put("Total frame time ms", phoneCam.getTotalFrameTimeMs());
-            packet.put("Pipeline time ms", phoneCam.getPipelineTimeMs());
-            packet.put("Overhead time ms", phoneCam.getOverheadTimeMs());
-            packet.put("Theoretical max FPS", phoneCam.getCurrentPipelineMaxFps());
+            packet.put("Frame Count", webcam.getFrameCount());
+            packet.put("FPS", String.format(Locale.US, "%.2f", webcam.getFps()));
+            packet.put("Total frame time ms", webcam.getTotalFrameTimeMs());
+            packet.put("Pipeline time ms", webcam.getPipelineTimeMs());
+            packet.put("Overhead time ms", webcam.getOverheadTimeMs());
+            packet.put("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
 
             /*
              * Send the packet to dashboard

@@ -4,12 +4,14 @@ import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.google.common.collect.ListMultimap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Auto.hardware.Drive;
 import org.firstinspires.ftc.teamcode.PPDev.CurvePoint;
 import org.firstinspires.ftc.teamcode.PPDev.PPMovement;
 import org.firstinspires.ftc.teamcode.PPDev.PPOdo;
+import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Util.Alliance;
 
 import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.followCurve;
 import static org.firstinspires.ftc.teamcode.PPDev.PPMovement.withinRangeOfEnd;
@@ -32,7 +34,7 @@ public abstract class PurePursuitBase<K extends Enum<K>> extends LinearOpMode {
 
 
     //The drive class
-    public Drive drive;
+    public Robot robot;
 
     //The starting position of the robot (use inches and the origin at the red loading zone and measured in inches. heading in radians
     private Pose2d starting_position = new Pose2d(0, 0, new Rotation2d(0.5));
@@ -52,13 +54,8 @@ public abstract class PurePursuitBase<K extends Enum<K>> extends LinearOpMode {
 
     public void initDriveMechanisms(){
         odometry = new PPOdo(hardwareMap, starting_position, PPOdo.HeadingMode.HEADING_FROM_ENCODERS);
-        drive = new Drive(this);
+        robot = new Robot(this, Alliance.RED);
 
-        drive.initHardware();
-        drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        drive.reverseRightSide();
-        drive.stop();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -83,9 +80,9 @@ public abstract class PurePursuitBase<K extends Enum<K>> extends LinearOpMode {
         });
         followCurve(currentPath, Math.toRadians(90));
         if(!currentPathDone() && !stopCurrentpath){
-            drive.update();
+            robot.update();
         } else {
-            drive.stopDrive();
+            robot.stop();
         }
     }
 
