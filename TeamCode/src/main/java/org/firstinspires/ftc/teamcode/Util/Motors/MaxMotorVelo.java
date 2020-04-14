@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.Util;
+package org.firstinspires.ftc.teamcode.Util.Motors;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.Util.HardwareNames;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.List;

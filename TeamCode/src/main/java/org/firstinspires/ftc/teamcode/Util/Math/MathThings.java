@@ -1,5 +1,14 @@
-package org.firstinspires.ftc.teamcode.Util;
+package org.firstinspires.ftc.teamcode.Util.Math;
 
+
+import android.util.ArrayMap;
+
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+import kotlin.jvm.internal.markers.KMutableList;
 
 public class MathThings {
 
@@ -56,6 +65,12 @@ public class MathThings {
     public static double focalLength(double seenPixelWidth, double knownDistance, double knownWidth){
         return (seenPixelWidth * knownDistance) / knownWidth;
     }
+
+    public static <K, V> Type getArrayMapType(){
+        return new TypeToken<ArrayMap<K, V>>(){}.getType();
+    }
+
+
 
 
 }

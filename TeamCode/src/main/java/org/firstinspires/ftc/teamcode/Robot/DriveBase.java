@@ -1,23 +1,20 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
-import com.google.common.collect.Lists;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.Util.DriveBaseVectors;
+import org.firstinspires.ftc.teamcode.Util.Math.DriveBaseVectors;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
-import org.firstinspires.ftc.teamcode.Util.MotorProfile;
+import org.firstinspires.ftc.teamcode.Util.Motors.MotorProfile;
 import org.openftc.revextensions2.ExpansionHubMotor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.Util.MathThings.m_v_mult;
+import static org.firstinspires.ftc.teamcode.Util.Math.MathThings.m_v_mult;
 
 public class DriveBase extends Component {
 
