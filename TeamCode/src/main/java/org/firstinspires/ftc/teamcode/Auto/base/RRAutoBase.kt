@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.Util.Alliance
 
 abstract class RRAutoBase(val alliance: Alliance): LinearOpMode() {
 
-
     lateinit var robot: Robot
 
     fun changeSide(pose: Pose2d): Pose2d {
@@ -38,9 +37,7 @@ abstract class RRAutoBase(val alliance: Alliance): LinearOpMode() {
     }
 
 
-    fun trajBusy(): Boolean {
-        return robot.roadRunnerBase.isBusy
-    }
+    fun trajBusy() = robot.roadRunnerBase.isBusy
 
     fun isActiveAndBusy(): Boolean{
         return opModeIsActive() && trajBusy()
@@ -52,16 +49,14 @@ abstract class RRAutoBase(val alliance: Alliance): LinearOpMode() {
         }
     }
 
-    fun followAsync(trajectory: Trajectory) {
-        robot.roadRunnerBase.followTrajectoryAsync(trajectory)
-    }
+    fun followAsync(trajectory: Trajectory) = robot.roadRunnerBase.followTrajectoryAsync(trajectory)
 
-    fun turnAsync(angle: Double){
-        robot.roadRunnerBase.turnAsync(angle)
-    }
+    fun turnAsync(angle: Double) = robot.roadRunnerBase.turnAsync(angle)
 
-    fun trajectoryBuilder(poseEstimate: Pose2d): TrajectoryBuilder {
-        return robot.roadRunnerBase.trajectoryBuilder(poseEstimate)
+    fun trajectoryBuilder(poseEstimate: Pose2d): TrajectoryBuilder = robot.roadRunnerBase.trajectoryBuilder(poseEstimate)
+
+    fun trajectoryBuilder():TrajectoryBuilder {
+        return trajectoryBuilder(poseEstimate)
     }
 
     fun trajectoryBuilderReversed(poseEstimate: Pose2d): TrajectoryBuilder {

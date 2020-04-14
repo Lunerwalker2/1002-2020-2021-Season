@@ -66,36 +66,68 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
             1 -> {
                 followAsync(
                         trajectoryBuilder(poseEstimate)
-                                .splineToLinearHeading(changeSide(Pose2d(-15.0, -34.0, toRadians(90.0 + 10.0))), changeSide(toRadians(90.0 + 15.0)))
-                                .build()
-                )
-                waitAndUpdate()
-                turnAsync(changeSide(25.0))
-                waitAndUpdate()
-                followAsync(
-                        trajectoryBuilder(poseEstimate)
-                                .lineToLinearHeading(changeSide(Vector2d(-20.0, -28.0)), changeSide(toRadians(140.0)))
+                                .splineToLinearHeading(changeSide(Pose2d(-44.0, -35.0, toRadians(90.0))), changeSide(toRadians(90.0)))
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
                         trajectoryBuilder(poseEstimate)
-                                .forward(3.0)
+                                .forward(2.0)
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
                         trajectoryBuilder(poseEstimate)
-                                .lineTo(changeSide(Vector2d(-28.0, -36.0)))
+                                .lineTo(changeSide(Vector2d(-28.0, -38.0)))
                                 .build()
                 )
+                waitAndUpdate()
+                turnAsync(changeSide(toRadians(20.0)))
                 waitAndUpdate()
             }
             2 -> {
-
+                followAsync(
+                        trajectoryBuilder(poseEstimate)
+                                .splineToLinearHeading(changeSide(Pose2d(-36.0, -35.0, toRadians(90.0))), changeSide(toRadians(90.0)))
+                                .build()
+                )
+                waitAndUpdate()
+                followAsync(
+                        trajectoryBuilder(poseEstimate)
+                                .forward(2.0)
+                                .build()
+                )
+                waitAndUpdate()
+                followAsync(
+                        trajectoryBuilder(poseEstimate)
+                                .lineTo(changeSide(Vector2d(-28.0, -38.0)))
+                                .build()
+                )
+                waitAndUpdate()
+                turnAsync(changeSide(toRadians(20.0)))
+                waitAndUpdate()
             }
             3 -> {
-
+                followAsync(
+                        trajectoryBuilder(poseEstimate)
+                                .splineToLinearHeading(changeSide(Pose2d(-29.0, -35.0, toRadians(90.0))), changeSide(toRadians(90.0)))
+                                .build()
+                )
+                waitAndUpdate()
+                followAsync(
+                        trajectoryBuilder(poseEstimate)
+                                .forward(2.0)
+                                .build()
+                )
+                waitAndUpdate()
+                followAsync(
+                        trajectoryBuilder(poseEstimate)
+                                .lineTo(changeSide(Vector2d(-28.0, -38.0)))
+                                .build()
+                )
+                waitAndUpdate()
+                turnAsync(changeSide(toRadians(20.0)))
+                waitAndUpdate()
             }
         }
 
