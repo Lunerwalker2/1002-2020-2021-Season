@@ -26,7 +26,7 @@ public class MeepMeepTesting {
     private static Alliance alliance = Alliance.BLUE;
 
     private static DriveConstraints constraints = new DriveConstraints(
-            40.0, 40.0, 0.0,
+            45.0, 45.0, 0.0,
             Math.toRadians(270.0), Math.toRadians(270.0), 0.0
     );
 
@@ -74,7 +74,16 @@ public class MeepMeepTesting {
                                 .splineToLinearHeading(changeSide(new Pose2d(36, -38, toRadians(55))), changeSide(toRadians(55)))
                                 .lineToLinearHeading(changeSide(new Vector2d(40, -33)), changeSide(toRadians(90)))
                                 .back(5)
-                                .lineToLinearHeading(changeSide(new Vector2d(0, -36)), 0)
+                                .lineToLinearHeading(changeSide(new Vector2d(0, -36)), changeSide(toRadians(180)))
+                                .splineToLinearHeading(changeSide(new Pose2d(-54, -40, toRadians(90 + 10))), changeSide(toRadians(90 + 10)))
+                                .splineToLinearHeading(changeSide(new Pose2d(-60, -34, toRadians(90))), changeSide(toRadians(90))) //1
+                                .forward(1)//1
+                                .back(7)//1
+                                .lineToLinearHeading(changeSide(new Vector2d(18, -38)), changeSide(toRadians(55)))
+                                .lineToLinearHeading(changeSide(new Vector2d(48, -36)), changeSide(toRadians(90)))
+                                .forward(4)
+                                .back(5)
+                                .lineToSplineHeading(changeSide(new Vector2d(0, -40)), changeSide(toRadians(0)))
                                 .build()
                 )
 //                .followTrajectorySequence(drive ->

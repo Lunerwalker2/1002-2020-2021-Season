@@ -3,50 +3,27 @@ package org.firstinspires.ftc.teamcode.Auto
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.Auto.base.RRAutoBase
-import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.opmode.SplineTest
 import org.firstinspires.ftc.teamcode.Robot.Robot
 import org.firstinspires.ftc.teamcode.Util.Alliance
 import org.firstinspires.ftc.teamcode.Vision.SubsystemVision
 import java.lang.Math.toRadians
 
-/*
-Red side full trajectory to stone 3:
-                                        /.splineToLinearHeading(new Pose2d(-15, -34, toRadians(90 + 10)), toRadians(90 + 15))
-                                        /.turn(Math.toRadians(25))
-                                        /.lineToLinearHeading(new Vector2d(-20, -28), toRadians(140))
-                                        /.forward(3)
-                                        /.lineTo(new Vector2d(-28, -36))
-                                        /.setReversed(true)
-                                        /.turn(toRadians(20))
-                                        /.lineToLinearHeading(new Vector2d(18, -36), toRadians(0))
-                                        /.setReversed(false)
-                                        /.splineToLinearHeading(new Pose2d(36, -38, toRadians(55)), toRadians(55))
-                                        /.lineToLinearHeading(new Vector2d(40, -33), toRadians(90))
-                                        /.back(5)
-                                        .lineToLinearHeading(new Vector2d(0, -36), 0)
- */
+@Autonomous(name = "Two Stone Red", group = "Two Stone")
+class TwoStoneRed : TwoStone(Alliance.RED)
 
-@Autonomous(name = "One Stone Red", group = "One Stone")
-class OneStoneRed : OneStone(Alliance.RED)
+@Autonomous(name = "Two Stone Blue", group = "Two Stone")
+class TwoStoneBlue : TwoStone(Alliance.BLUE)
 
-@Autonomous(name = "One Stone Blue", group = "One Stone")
-class OneStoneBlue : OneStone(Alliance.BLUE)
-
-
-
-
-abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
-
+abstract class TwoStone(alliance: Alliance): RRAutoBase(alliance) {
 
     val vision = SubsystemVision(this)
 
     var skystonePosition = 0
 
-
     @Throws(InterruptedException::class)
     override fun runOpMode() {
+
         robot = Robot(this, alliance)
 
         vision.init()
@@ -61,23 +38,22 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
 
         vision.stopVision()
 
-
         when(skystonePosition){
             1 -> {
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .splineToLinearHeading(changeSide(Pose2d(-44.0, -35.0, toRadians(90.0))), changeSide(toRadians(90.0)))
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .forward(2.0)
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .lineTo(changeSide(Vector2d(-28.0, -38.0)))
                                 .build()
                 )
@@ -85,19 +61,19 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
             }
             2 -> {
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .splineToLinearHeading(changeSide(Pose2d(-36.0, -35.0, toRadians(90.0))), changeSide(toRadians(90.0)))
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .forward(2.0)
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .lineTo(changeSide(Vector2d(-28.0, -38.0)))
                                 .build()
                 )
@@ -105,19 +81,19 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
             }
             3 -> {
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
-                                .splineToLinearHeading(changeSide(Pose2d(-29.0, -35.0, toRadians(90.0))), changeSide(toRadians(90.0)))
+                        trajectoryBuilder()
+                                .splineToLinearHeading(changeSide(Pose2d(-29.0, -35.0,toRadians(90.0))), changeSide(toRadians(90.0)))
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .forward(2.0)
                                 .build()
                 )
                 waitAndUpdate()
                 followAsync(
-                        trajectoryBuilder(poseEstimate)
+                        trajectoryBuilder()
                                 .lineTo(changeSide(Vector2d(-28.0, -38.0)))
                                 .build()
                 )
@@ -135,33 +111,99 @@ abstract class OneStone(alliance: Alliance): RRAutoBase(alliance) {
         )
         waitAndUpdate()
         followAsync(
-                trajectoryBuilder(poseEstimate)
+                trajectoryBuilder()
                         .splineToLinearHeading(changeSide(Pose2d(36.0, -38.0, toRadians(55.0))), changeSide(toRadians(55.0)))
                         .build()
         )
         //Go to foundation
         waitAndUpdate()
         followAsync(
-                trajectoryBuilder(poseEstimate)
+                trajectoryBuilder()
                         .lineToLinearHeading(changeSide(Vector2d(40.0, -33.0)), changeSide(toRadians(90.0)))
                         .build()
         )
-        //Park
         waitAndUpdate()
         followAsync(
-                trajectoryBuilder(poseEstimate)
+                trajectoryBuilder()
                         .back(5.0)
                         .build()
         )
         waitAndUpdate()
         followAsync(
-                trajectoryBuilder(poseEstimate)
-                        .lineToLinearHeading(changeSide(Vector2d(0.0, -36.0)), changeSide(toRadians(0.0)))
+                trajectoryBuilder()
+                        .lineToLinearHeading(changeSide(Vector2d(0.0, -36.0)), changeSide(toRadians(180.0)))
                         .build()
         )
         waitAndUpdate()
-      
-      //Normally called on stop(), but here, stop() is whatever we want baby
-      robot.stop()
+        followAsync(
+                trajectoryBuilder()
+                        .splineToLinearHeading(changeSide(Pose2d(-54.0, -40.0, toRadians(90.0 + 10))), changeSide(toRadians(90.0 + 10)))
+                        .build()
+        )
+        waitAndUpdate()
+        //Second stone. We can'y reach the first stone, so if it's that we must get a different one
+        when(skystonePosition){
+            1,2 -> {
+                followAsync(
+                        trajectoryBuilder()
+                                .splineToLinearHeading(changeSide(Pose2d(-60.0, -34.0, toRadians(90.0))), changeSide(toRadians(90.0)))
+                                .build()
+                )
+                waitAndUpdate()
+            }
+            3 -> {
+                followAsync(
+                        trajectoryBuilder()
+                                .splineToLinearHeading(changeSide(Pose2d(-52.0, -34.0, toRadians(90.0))), changeSide(toRadians(90.0)))
+                                .build()
+                )
+                waitAndUpdate()
+            }
+        }
+        followAsync(
+                trajectoryBuilder()
+                        .forward(1.0)
+                        .build()
+        )
+        waitAndUpdate()
+        followAsync(
+                trajectoryBuilder()
+                        .back(7.0)
+                        .build()
+        )
+        waitAndUpdate()
+        followAsync(
+                trajectoryBuilder()
+                        .lineToLinearHeading(changeSide(Vector2d(18.0, -38.0)), changeSide(toRadians(55.0)))
+                        .build()
+        )
+        waitAndUpdate()
+        followAsync(
+                trajectoryBuilder()
+                        .lineToLinearHeading(changeSide(Vector2d(48.0, -36.0)), changeSide(toRadians(90.0)))
+                        .build()
+        )
+        waitAndUpdate()
+        followAsync(
+                trajectoryBuilder()
+                        .forward(1.0)
+                        .build()
+        )
+        waitAndUpdate()
+        followAsync(
+                trajectoryBuilder()
+                        .back(5.0)
+                        .build()
+        )
+        waitAndUpdate()
+        followAsync(
+                trajectoryBuilder()
+                        .lineToSplineHeading(changeSide( Vector2d(0.0, -40.0)), changeSide(toRadians(0.0)))
+                        .build()
+        )
+        waitAndUpdate()
+
+        //Normally called on stop(), but here, stop() is whatever we want baby
+        robot.stop()
     }
 }
