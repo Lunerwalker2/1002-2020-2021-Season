@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Util.Math;
 
 import android.util.ArrayMap;
 
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -64,6 +65,25 @@ public class MathThings {
 
     public static double focalLength(double seenPixelWidth, double knownDistance, double knownWidth){
         return (seenPixelWidth * knownDistance) / knownWidth;
+    }
+
+    public static Vector2d toField(Vector2d translation, double headingRad){
+
+        return translation.rotated(-headingRad);
+//
+//        //Convert x, y to theta, r
+//
+//        double r = translation.norm();
+//        double theta = translation.angle();
+//
+//        //actually theta - headingRad, but heading should be negated.
+//        double modifiedTheta = theta - -headingRad;
+//
+//        //Convert theta and r back to a forward and strafe
+//        double forward = r * Math.cos(modifiedTheta);
+//        double strafe = r * Math.sin(modifiedTheta);
+//
+//        return new Vector2d(forward, strafe);
     }
 
     public static <K, V> Type getArrayMapType(){
