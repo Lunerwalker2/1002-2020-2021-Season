@@ -4,9 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Alliance;
-
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 /*
  * This is a simple routine to test turning capabilities.
  */
@@ -17,17 +15,12 @@ public class TurnTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, Alliance.OTHER);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
         if (isStopRequested()) return;
 
-        robot.roadRunnerBase.turnAsync(Math.toRadians(ANGLE));
-
-        while(opModeIsActive()){
-            robot.roadRunnerBase.update();
-            robot.update();;
-        }
+        drive.turn(Math.toRadians(ANGLE));
     }
 }

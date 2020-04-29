@@ -11,8 +11,7 @@ import com.qualcomm.robotcore.util.MovingStatistics;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Alliance;
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 
 /*
  * This routine determines the effective track width. The procedure works by executing a point turn
@@ -34,7 +33,7 @@ public class TrackWidthTuner extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Robot robot = new Robot(this, Alliance.OTHER);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         // TODO: if you haven't already, set the localizer to something that doesn't depend on
         // drive encoders for computing the heading
 
@@ -52,21 +51,20 @@ public class TrackWidthTuner extends LinearOpMode {
 
         MovingStatistics trackWidthStats = new MovingStatistics(NUM_TRIALS);
         for (int i = 0; i < NUM_TRIALS; i++) {
-            robot.roadRunnerBase.setPoseEstimate(new Pose2d());
+            drive.setPoseEstimate(new Pose2d());
 
             // it is important to handle heading wraparounds
             double headingAccumulator = 0;
             double lastHeading = 0;
 
-            robot.roadRunnerBase.turnAsync(Math.toRadians(ANGLE));
+            drive.turnAsync(Math.toRadians(ANGLE));
 
-            while (!isStopRequested() && robot.roadRunnerBase.isBusy()) {
-                double heading = robot.roadRunnerBase.getPoseEstimate().getHeading();
+            while (!isStopRequested() && drive.isBusy()) {
+                double heading = drive.getPoseEstimate().getHeading();
                 headingAccumulator += Angle.norm(heading - lastHeading);
                 lastHeading = heading;
 
-                robot.roadRunnerBase.update();
-                robot.update();
+                drive.update();
             }
 
             double trackWidth = DriveConstants.TRACK_WIDTH * Math.toRadians(ANGLE) / headingAccumulator;

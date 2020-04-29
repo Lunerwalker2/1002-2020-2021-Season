@@ -6,8 +6,10 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Alliance;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
+
+import java.io.File;
 
 /*
  * This is a simple routine to test translational drive capabilities.
@@ -19,9 +21,9 @@ public class StraightTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, Alliance.OTHER);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Trajectory trajectory = robot.roadRunnerBase.trajectoryBuilder(new Pose2d())
+        Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())
                 .forward(DISTANCE)
                 .build();
 
@@ -29,11 +31,7 @@ public class StraightTest extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        robot.roadRunnerBase.followTrajectoryAsync(trajectory);
 
-        while(opModeIsActive()){
-            robot.roadRunnerBase.update();
-            robot.update();
-        }
+        drive.followTrajectory(trajectory);
     }
 }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -12,9 +13,13 @@ import org.firstinspires.ftc.teamcode.Util.PlaySound;
 
 import kotlin.Unit;
 
+@Config
 @TeleOp(name="Main", group = "TeleOp")
 public class TeleOpMain extends OpMode {
 
+    public static double VX_WEIGHT = 0.8;
+    public static double VY_WEIGHT = 0.8;
+    public static double OMEGA_WEIGHT = 0.8;
 
     private Debouncer soundControl;
 
@@ -56,8 +61,10 @@ public class TeleOpMain extends OpMode {
 
         soundControl.check();
 
-        DriveFields.movement_x = gamepad1.left_stick_x;
-        DriveFields.movement_y = -gamepad1.left_stick_y;
+        //We are using RR's kinematics, and they call for this arrangement
+        DriveFields.movement_x = gamepad1.left_stick_y;
+        //noinspection SuspiciousNameCombination
+        DriveFields.movement_y = gamepad1.left_stick_x;
         DriveFields.movement_turn = gamepad1.right_stick_x;
 
         robot.update();

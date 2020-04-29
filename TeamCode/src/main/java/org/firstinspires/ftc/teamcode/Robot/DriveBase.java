@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.kinematics.MecanumKinematics;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -19,14 +21,9 @@ import static org.firstinspires.ftc.teamcode.Util.Math.MathThings.m_v_mult;
 public class DriveBase extends Component {
 
 
-    //These are public because reflection is weird. Just leave them
-    @MotorProfile(hardwareName = HardwareNames.Drive.LEFT_FRONT, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.FORWARD)
      public ExpansionHubMotor left_front_drive;
-    @MotorProfile(hardwareName = HardwareNames.Drive.LEFT_BACK, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.FORWARD)
      public ExpansionHubMotor left_back_drive;
-    @MotorProfile(hardwareName = HardwareNames.Drive.RIGHT_FRONT, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.REVERSE)
      public ExpansionHubMotor right_front_drive;
-    @MotorProfile(hardwareName = HardwareNames.Drive.RIGHT_BACK, defaultZeroPowerBehavior =  DcMotor.ZeroPowerBehavior.BRAKE, defaultDirection = DcMotorSimple.Direction.REVERSE)
      public ExpansionHubMotor right_back_drive;
 
     private ArrayList<ExpansionHubMotor> motors;
@@ -70,14 +67,11 @@ public class DriveBase extends Component {
      */
     public void updateHolonomic(){
 
-        double x = DriveFields.movement_x;
-        double y = DriveFields.movement_y;
-        double turn = DriveFields.movement_turn;
+        Pose2d vel = DriveFields.normalizedVels();
 
-        double[] inputs = {x, y, turn};
+        List<Double> drivePowers = MecanumKinematics.robotToWheelVelocities(vel, 1.0, 1.0, DriveFields.lateralMultiplier);
 
-        double[] output = m_v_mult(matrix, inputs);
-        DriveFields.distributePowers(output);
+        DriveFields.distributePowers(drivePowers);
 
         setPower();
     }

@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.config.ValueProvider;
 import com.acmerobotics.dashboard.config.variable.BasicVariable;
 import com.acmerobotics.dashboard.config.variable.CustomVariable;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
@@ -18,12 +18,18 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Alliance;
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 
 import java.util.List;
 
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.BASE_CONSTRAINTS;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.getMotorVelocityF;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.kV;
 
 /*
@@ -48,7 +54,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
     private String catName;
     private CustomVariable catVar;
 
-    private Robot robot;
+    private SampleMecanumDrive drive;
 
     private static MotionProfile generateProfile(boolean movingForward) {
         MotionState start = new MotionState(movingForward ? 0 : DISTANCE, 0, 0, 0);
@@ -61,6 +67,7 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
     private void addPidVariable() {
         catName = getClass().getSimpleName();
+
         catVar = (CustomVariable) dashboard.getConfigRoot().getVariable(catName);
         if (catVar == null) {
             // this should never happen...
@@ -74,39 +81,39 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
         pidVar.putVariable("kP", new BasicVariable<>(new ValueProvider<Double>() {
             @Override
             public Double get() {
-                return robot.roadRunnerBase.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kP;
+                return drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kP;
             }
 
             @Override
             public void set(Double value) {
-                PIDCoefficients coeffs = robot.roadRunnerBase.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.roadRunnerBase.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                PIDCoefficients coeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                         new PIDCoefficients(value, coeffs.kI, coeffs.kD));
             }
         }));
         pidVar.putVariable("kI", new BasicVariable<>(new ValueProvider<Double>() {
             @Override
             public Double get() {
-                return robot.roadRunnerBase.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kI;
+                return drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kI;
             }
 
             @Override
             public void set(Double value) {
-                PIDCoefficients coeffs = robot.roadRunnerBase.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.roadRunnerBase.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                PIDCoefficients coeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                         new PIDCoefficients(coeffs.kP, value, coeffs.kD));
             }
         }));
         pidVar.putVariable("kD", new BasicVariable<>(new ValueProvider<Double>() {
             @Override
             public Double get() {
-                return robot.roadRunnerBase.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kD;
+                return drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).kD;
             }
 
             @Override
             public void set(Double value) {
-                PIDCoefficients coeffs = robot.roadRunnerBase.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.roadRunnerBase.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                PIDCoefficients coeffs = drive.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+                drive.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                         new PIDCoefficients(coeffs.kP, coeffs.kI, value));
             }
         }));
@@ -131,12 +138,17 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
                     "PID is not in use", getClass().getSimpleName());
         }
 
-        robot = new Robot(this, Alliance.OTHER);
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+
+        drive = new SampleMecanumDrive(hardwareMap);
 
         addPidVariable();
 
         NanoClock clock = NanoClock.system();
 
+        telemetry.addLine("Ready!");
+        telemetry.update();
+        telemetry.clearAll();
 
         waitForStart();
 
@@ -148,8 +160,6 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
 
         while (!isStopRequested()) {
-            TelemetryPacket packet = robot.packet;
-
             // calculate and set the motor power
             double profileTime = clock.seconds() - profileStart;
 
@@ -162,19 +172,17 @@ public class DriveVelocityPIDTuner extends LinearOpMode {
 
             MotionState motionState = activeProfile.get(profileTime);
             double targetPower = kV * motionState.getV();
-            robot.roadRunnerBase.setDrivePower(new Pose2d(targetPower, 0, 0));
+            drive.setDrivePower(new Pose2d(targetPower, 0, 0));
 
-            List<Double> velocities = robot.roadRunnerBase.getWheelVelocities();
-
-            robot.roadRunnerBase.update();
-            robot.update();
+            List<Double> velocities = drive.getWheelVelocities();
 
             // update telemetry
-            packet.put("targetVelocity", motionState.getV());
+            telemetry.addData("targetVelocity", motionState.getV());
             for (int i = 0; i < velocities.size(); i++) {
-                packet.put("velocity" + i, velocities.get(i));
-                packet.put("error" + i, motionState.getV() - velocities.get(i));
+                telemetry.addData("velocity" + i, velocities.get(i));
+                telemetry.addData("error" + i, motionState.getV() - velocities.get(i));
             }
+            telemetry.update();
         }
 
         removePidVariable();

@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.Util.Math;
 import android.util.ArrayMap;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -85,6 +86,7 @@ public class MathThings {
 //
 //        return new Vector2d(forward, strafe);
     }
+    
 
     public static <K, V> Type getArrayMapType(){
         return new TypeToken<ArrayMap<K, V>>(){}.getType();

@@ -29,7 +29,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.LynxModuleUtil;
 
@@ -37,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.BASE_CONSTRAINTS;
-import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.BASE_CONSTRAINTS;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.RUN_USING_ENCODER;

@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Alliance;
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -18,22 +19,23 @@ import org.firstinspires.ftc.teamcode.Util.Alliance;
 @Config
 @TeleOp(group = "drive")
 public class LocalizationTest extends LinearOpMode {
-    public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 1;
-
+    public static double VX_WEIGHT = 0.8;
+    public static double VY_WEIGHT = 0.8;
+    public static double OMEGA_WEIGHT = 0.8;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, Alliance.OTHER);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
         while (!isStopRequested()) {
             Pose2d baseVel = new Pose2d(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x
+                    gamepad1.left_stick_y,
+                    gamepad1.left_stick_x,
+                    gamepad1.right_stick_x
             );
 
             Pose2d vel;
@@ -51,11 +53,15 @@ public class LocalizationTest extends LinearOpMode {
                 vel = baseVel;
             }
 
-            robot.roadRunnerBase.setDrivePower(vel);
+            drive.setDrivePower(vel);
 
-            robot.roadRunnerBase.update();
-            robot.update();
+            drive.update();
 
+            Pose2d poseEstimate = drive.getPoseEstimate();
+            telemetry.addData("x", poseEstimate.getX());
+            telemetry.addData("y", poseEstimate.getY());
+            telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.update();
         }
     }
 }

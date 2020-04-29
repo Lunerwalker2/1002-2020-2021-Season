@@ -6,8 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.Robot.Robot;
-import org.firstinspires.ftc.teamcode.Util.Alliance;;
+import org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.SampleMecanumDrive;
 
 /*
  * Op mode for tuning follower PID coefficients (located in the drive base classes). The robot
@@ -20,30 +19,22 @@ public class FollowerPIDTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot robot = new Robot(this, Alliance.OTHER);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         Pose2d startPose = new Pose2d(-DISTANCE / 2, -DISTANCE / 2, 0);
 
-        robot.roadRunnerBase.setPoseEstimate(startPose);
+        drive.setPoseEstimate(startPose);
 
         waitForStart();
 
         if (isStopRequested()) return;
 
         while (!isStopRequested()) {
-            Trajectory traj = robot.roadRunnerBase.trajectoryBuilder(startPose)
+            Trajectory traj = drive.trajectoryBuilder(startPose)
                     .forward(DISTANCE)
                     .build();
-            while(opModeIsActive() && robot.roadRunnerBase.isBusy()) {
-                robot.roadRunnerBase.followTrajectoryAsync(traj);
-                robot.roadRunnerBase.update();
-                robot.update();
-            }
-            while(opModeIsActive() && robot.roadRunnerBase.isBusy()) {
-                robot.roadRunnerBase.turn(Math.toRadians(90));
-                robot.roadRunnerBase.update();
-                robot.update();
-            }
+            drive.followTrajectory(traj);
+            drive.turn(Math.toRadians(90));
 
             startPose = traj.end().plus(new Pose2d(0, 0, Math.toRadians(90)));
         }

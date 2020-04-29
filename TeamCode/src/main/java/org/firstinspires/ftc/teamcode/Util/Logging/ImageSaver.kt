@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil
 import org.opencv.android.Utils
 import org.opencv.core.Mat
+import org.opencv.imgcodecs.Imgcodecs
 import java.io.File
 import java.io.OutputStream
 
@@ -25,15 +26,17 @@ class ImageSaver(fileName: String, val image: Bitmap) {
             return bitmap
         }
 
-        val imageDir = File(AppUtil.ROOT_FOLDER.toString() + "/Images/")
+        val imageDir = File(AppUtil.FIRST_FOLDER.toString() + "/Images")
     }
 
     private val outputStream: OutputStream
 
 
     init {
-        imageDir.mkdirs()
-        outputStream = File(imageDir, "${fileName}.png").outputStream()
+        if (!imageDir.exists()){
+            imageDir.mkdir()
+        }
+        outputStream = File(imageDir, "/${fileName}.png").outputStream()
     }
 
     fun save(): Boolean{

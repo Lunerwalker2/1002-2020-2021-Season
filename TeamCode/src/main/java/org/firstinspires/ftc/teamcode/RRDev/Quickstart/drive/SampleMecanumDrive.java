@@ -25,25 +25,26 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.RRDev.Quickstart.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.Robot.DriveFields;
-import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Util.HardwareNames;
-import org.openftc.revextensions2.ExpansionHubMotor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.BASE_CONSTRAINTS;
-import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.MOTOR_VELO_PID;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.encoderTicksToInches;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.getMotorVelocityF;
 import static org.firstinspires.ftc.teamcode.RRDev.Quickstart.drive.DriveConstants.kA;
@@ -65,6 +66,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         FOLLOW_TRAJECTORY
     }
 
+    private FtcDashboard dashboard;
     private NanoClock clock;
 
     private Mode mode;
@@ -76,18 +78,19 @@ public class SampleMecanumDrive extends MecanumDrive {
     public DriveConstraints constraints;
     private TrajectoryFollower follower;
 
-    private List<Pose2d> poseHistory;
+    public List<Pose2d> poseHistory;
 
+    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
+    private List<LynxModule> hubs;
 
-    private Robot robot;
+    public SampleMecanumDrive(HardwareMap hardwareMap) {
+        super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, DriveFields.lateralMultiplier);//trying a higher lateral multiplier
 
-    public SampleMecanumDrive(Robot robot) {
-
-        super(kV, kA, kStatic, TRACK_WIDTH);
-
-        this.robot = robot;
+        dashboard = FtcDashboard.getInstance();
+        dashboard.setTelemetryTransmissionInterval(25);
 
         clock = NanoClock.system();
 
@@ -102,29 +105,45 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         poseHistory = new ArrayList<>();
 
+        LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
+
+        hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule module : hubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = robot.opMode.hardwareMap.get(BNO055IMU.class, HardwareNames.Sensors.RIGHT_HUB_IMU);
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
 
-        // upward (normal to the floor) using a command like the following:
-        // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        leftFront = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.LEFT_FRONT);
+        leftRear = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.LEFT_BACK);
+        rightRear = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.RIGHT_BACK);
+        rightFront = hardwareMap.get(DcMotorEx.class, HardwareNames.Drive.RIGHT_FRONT);
 
+        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
-        robot.driveBase.setMaxRPMFraction(1.0);
+        for (DcMotorEx motor : motors) {
+            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
+            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
+            motor.setMotorType(motorConfigurationType);
+        }
+
+        if (RUN_USING_ENCODER) {
+            setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
             setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
 
-
-
-
-        //if desired, use setLocalizer() to change the localization method
-        setLocalizer(robot.odometry.getOdometryKt());
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -176,17 +195,22 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
-
+        //clearBulkCache();
+        updatePoseEstimate();
 
         Pose2d currentPose = getPoseEstimate();
         Pose2d lastError = getLastError();
 
         poseHistory.add(currentPose);
 
-        TelemetryPacket packet = robot.packet;
+        TelemetryPacket packet = new TelemetryPacket();
         Canvas fieldOverlay = packet.fieldOverlay();
 
         packet.put("mode", mode);
+
+        packet.put("x", currentPose.getX());
+        packet.put("y", currentPose.getY());
+        packet.put("heading", currentPose.getHeading());
 
         packet.put("xError", lastError.getX());
         packet.put("yError", lastError.getY());
@@ -231,10 +255,6 @@ public class SampleMecanumDrive extends MecanumDrive {
                 double t = follower.elapsedTime();
                 DashboardUtil.drawRobot(fieldOverlay, trajectory.get(t));
 
-                fieldOverlay.setStroke("#3F51B5");
-                DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
-                DashboardUtil.drawRobot(fieldOverlay, currentPose);
-
                 if (!follower.isFollowing()) {
                     mode = Mode.IDLE;
                     setDriveSignal(new DriveSignal());
@@ -243,6 +263,13 @@ public class SampleMecanumDrive extends MecanumDrive {
                 break;
             }
         }
+
+
+        fieldOverlay.setStroke("#3F51B5");
+        DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
+        DashboardUtil.drawRobot(fieldOverlay, currentPose);
+
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public void waitForIdle() {
@@ -255,53 +282,66 @@ public class SampleMecanumDrive extends MecanumDrive {
         return mode != Mode.IDLE;
     }
 
+    public void setMode(DcMotor.RunMode runMode) {
+        for (DcMotorEx motor : motors) {
+            motor.setMode(runMode);
+        }
+    }
+
+    private void clearBulkCache(){
+        for(LynxModule hub : hubs){
+            hub.clearBulkCache();
+        }
+    }
+
+    public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+        for (DcMotorEx motor : motors) {
+            motor.setZeroPowerBehavior(zeroPowerBehavior);
+        }
+    }
 
     public PIDCoefficients getPIDCoefficients(DcMotor.RunMode runMode) {
-        PIDFCoefficients coefficients = robot.driveBase.getPIDCoefficients(runMode);
+        PIDFCoefficients coefficients = leftFront.getPIDFCoefficients(runMode);
         return new PIDCoefficients(coefficients.p, coefficients.i, coefficients.d);
     }
 
     public void setPIDCoefficients(DcMotor.RunMode runMode, PIDCoefficients coefficients) {
-        robot.driveBase.setPIDCoefficients(new PIDFCoefficients(
-                coefficients.kP, coefficients.kI, coefficients.kD, getMotorVelocityF()
-        ), runMode);
+        for (DcMotorEx motor : motors) {
+            motor.setPIDFCoefficients(runMode, new PIDFCoefficients(
+                    coefficients.kP, coefficients.kI, coefficients.kD, getMotorVelocityF()
+            ));
+        }
     }
-
-
 
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
         List<Double> wheelPositions = new ArrayList<>();
-        for (Integer position : robot.driveBase.getWheelEncoderPositionsRR()) {
-            wheelPositions.add(encoderTicksToInches(position));
+        for (DcMotorEx motor : motors) {
+            wheelPositions.add(encoderTicksToInches(motor.getCurrentPosition()));
         }
         return wheelPositions;
     }
 
     public List<Double> getWheelVelocities() {
         List<Double> wheelVelocities = new ArrayList<>();
-        for (Double velocity : robot.driveBase.getWheelEncoderVelocitiesRR()) {
-            wheelVelocities.add(encoderTicksToInches(velocity));
+        for (DcMotorEx motor : motors) {
+            wheelVelocities.add(encoderTicksToInches(motor.getVelocity()));
         }
         return wheelVelocities;
     }
 
-
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        DriveFields.lf_power = v;
-        DriveFields.lb_power = v1;
-        DriveFields.rf_power = v3;
-        DriveFields.rb_power = v2;
+        leftFront.setPower(v);
+        leftRear.setPower(v1);
+        rightRear.setPower(v2);
+        rightFront.setPower(v3);
     }
 
-    private double addOffsetRad(double heading, double offset){
-        return AngleUnit.normalizeRadians(heading + offset);
-    }
 
     @Override
     public double getRawExternalHeading() {
-        return addOffsetRad(imu.getAngularOrientation().firstAngle,-90);
+        return AngleUnit.normalizeRadians(imu.getAngularOrientation().firstAngle + Math.toRadians(90));
     }
 }

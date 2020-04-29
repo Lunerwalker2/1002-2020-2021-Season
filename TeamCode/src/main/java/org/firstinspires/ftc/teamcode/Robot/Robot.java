@@ -72,7 +72,7 @@ public class Robot {
             odometry = new Odometry(this,userStartingPosition);
         }
 
-        roadRunnerBase = new SampleMecanumDrive(this);
+        roadRunnerBase = new SampleMecanumDrive(opMode.hardwareMap);
 
 
         //Set dashboard update time
@@ -111,10 +111,10 @@ public class Robot {
     private void compileTelemetry(){
         packet = new TelemetryPacket();
 
-        packet.put("Robot X", Odometry.world_x_position);
-        packet.put("Robot Y", Odometry.world_y_position);
-        packet.put("Robot Heading (deg)", Odometry.world_angle_deg);
-        packet.put("Robot Heading (rad)", Odometry.world_angle_rad);
+        packet.put("Robot X", Odometry.Companion.getWorld_x_position());
+        packet.put("Robot Y", Odometry.Companion.getWorld_x_position());
+        packet.put("Robot Heading (deg)", Odometry.Companion.getWorld_x_position());
+        packet.put("Robot Heading (rad)", Odometry.Companion.getWorld_x_position());
 
         packet.put("Movement X", movement_x);
         packet.put("Movement Y", movement_y);
